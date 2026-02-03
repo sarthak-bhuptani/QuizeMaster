@@ -10,6 +10,7 @@ import {
     Star as StarIcon, Code, Music, Gamepad2, ChevronRight, Activity
 } from 'lucide-react';
 import Footer from '../components/Footer';
+import './Home.css';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -87,16 +88,9 @@ const Home = () => {
     ];
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            background: '#020617', // Slate 950
-            color: '#f8fafc',
-            fontFamily: "'Outfit', sans-serif",
-            overflowX: 'hidden',
-            position: 'relative'
-        }}>
+        <div className="home-container">
             {/* Animated Background Elements */}
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}>
+            <div className="desktop-bg-elements">
                 <motion.div
                     style={{
                         y: y1,
@@ -119,15 +113,7 @@ const Home = () => {
 
             {/* Split Hero Section */}
             <section style={{ padding: '4rem 5%', minHeight: '90vh', display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1.2fr 1fr',
-                    gap: '6rem',
-                    alignItems: 'center',
-                    maxWidth: '1400px',
-                    margin: '0 auto',
-                    width: '100%'
-                }}>
+                <div className="hero-grid">
 
                     {/* Left Content */}
                     <motion.div
@@ -150,14 +136,7 @@ const Home = () => {
                             <Sparkles size={18} /> THE FUTURE OF LEARNING
                         </motion.div>
 
-                        <h1 style={{
-                            fontSize: 'clamp(3.5rem, 6vw, 5.5rem)',
-                            fontWeight: '900',
-                            lineHeight: 1,
-                            marginBottom: '2rem',
-                            letterSpacing: '-0.04em',
-                            color: '#ffffff'
-                        }}>
+                        <h1 className="hero-title">
                             Master your <br />
                             <span className="gradient-text">Future Today.</span>
                         </h1>
@@ -174,7 +153,7 @@ const Home = () => {
                             loved by students, and built for results that actually matter.
                         </p>
 
-                        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                        <div className="btn-group">
                             <Link to="/student/signup" style={{ textDecoration: 'none' }}>
                                 <motion.button
                                     whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(99, 102, 241, 0.5)' }}
@@ -208,7 +187,7 @@ const Home = () => {
                         </div>
 
                         {/* Motivation Stats */}
-                        <div style={{ marginTop: '5rem', display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
+                        <div className="motivation-stats">
                             {motivationCards.map((card, i) => (
                                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <div style={{ background: `${card.color}20`, padding: '10px', borderRadius: '12px' }}>
@@ -346,7 +325,7 @@ const Home = () => {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15rem' }}>
                         {/* Feature 1: The Engine */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8rem', alignItems: 'center' }}>
+                        <div className="feature-grid">
                             <motion.div
                                 initial={{ opacity: 0, x: -50 }}
                                 whileInView={{ opacity: 1, x: 0 }}
@@ -375,46 +354,31 @@ const Home = () => {
                                 whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                                 style={{ position: 'relative' }}
                             >
-                                <div style={{
-                                    aspectRatio: '16/10', borderRadius: '40px', background: 'linear-gradient(135deg, #0f172a 0%, #020617 100%)',
-                                    border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', padding: '3rem',
-                                    boxShadow: '0 50px 100px -30px rgba(0,0,0,0.5)'
-                                }}>
-                                    <div style={{ height: '100%', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <motion.div
-                                            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
-                                            transition={{ duration: 4, repeat: Infinity }}
-                                            style={{ width: '150px', height: '150px', borderRadius: '50%', background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)', filter: 'blur(30px)' }}
-                                        />
-                                        <Zap size={80} color="#06b6d4" style={{ position: 'absolute' }} />
-                                    </div>
+                                <div className="feature-image-container">
+                                    <img
+                                        src="/assessment_engine.png"
+                                        alt="Assessment Engine"
+                                        className="feature-image"
+                                    />
+                                    <div className="feature-image-glow" />
                                 </div>
                             </motion.div>
                         </div>
 
                         {/* Feature 2: Analytics */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8rem', alignItems: 'center' }}>
+                        <div className="feature-grid">
                             <motion.div
                                 initial={{ opacity: 0, order: 2, scale: 0.9, rotate: -5 }}
                                 whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                                 style={{ position: 'relative' }}
                             >
-                                <div style={{
-                                    aspectRatio: '16/10', borderRadius: '40px', background: 'linear-gradient(225deg, #0f172a 0%, #020617 100%)',
-                                    border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', padding: '3rem',
-                                    boxShadow: '0 50px 100px -30px rgba(0,0,0,0.5)'
-                                }}>
-                                    <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', height: '100%', justifyContent: 'center' }}>
-                                        {[60, 40, 90, 70, 100, 50, 80].map((h, i) => (
-                                            <motion.div
-                                                key={i}
-                                                initial={{ height: 0 }}
-                                                whileInView={{ height: `${h}%` }}
-                                                transition={{ delay: i * 0.1, duration: 1 }}
-                                                style={{ width: '30px', background: 'linear-gradient(to top, #ec489980, #ec489920)', borderRadius: '10px', border: '1px solid #ec489940' }}
-                                            />
-                                        ))}
-                                    </div>
+                                <div className="feature-image-container">
+                                    <img
+                                        src="/analytics_dashboard.png"
+                                        alt="Analytics Dashboard"
+                                        className="feature-image"
+                                    />
+                                    <div className="feature-image-glow pink" />
                                 </div>
                             </motion.div>
                             <motion.div
@@ -457,27 +421,27 @@ const Home = () => {
                         </p>
                     </motion.div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    <div className="categories-grid">
                         {categories.map((cat, i) => (
                             <motion.div
                                 key={i}
                                 whileHover={{ y: -5, background: 'rgba(255,255,255,0.05)' }}
                                 style={{
                                     background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)',
-                                    borderRadius: '24px', padding: '2rem', cursor: 'pointer',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem'
+                                    borderRadius: '24px', padding: '1rem', cursor: 'pointer', /* Reduce padding for mobile */
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem'
                                 }}
                             >
                                 <div style={{
-                                    width: '70px', height: '70px', borderRadius: '22px',
+                                    width: '50px', height: '50px', borderRadius: '18px', /* Reduce size for mobile */
                                     background: `${cat.color}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     boxShadow: `0 10px 30px ${cat.color}30`
                                 }}>
-                                    <cat.icon size={32} color="#fff" />
+                                    <cat.icon size={24} color="#fff" />
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#fff', marginBottom: '0.25rem' }}>{cat.name}</h3>
-                                    <p style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '600' }}>{cat.count} quizzes</p>
+                                    <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', marginBottom: '0.25rem' }}>{cat.name}</h3>
+                                    <p style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '600' }}>{cat.count}</p>
                                 </div>
                             </motion.div>
                         ))}
@@ -507,13 +471,7 @@ const Home = () => {
                                 initial={{ opacity: 0, x: -20 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                    padding: '1.5rem 2rem',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    borderRadius: '20px'
-                                }}
+                                className="leaderboard-card"
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                     <div style={{
@@ -672,12 +630,6 @@ const Home = () => {
                 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
                 
                 body { margin: 0; background: #020617; color: #f8fafc; }
-
-                @media (max-width: 1100px) {
-                    div[style*="grid-template-columns: 1.2fr 1fr"] { grid-template-columns: 1fr !important; text-align: center; }
-                    div[style*="justifyContent: flex-start"], div[style*="justifyContent: space-between"] { justify-content: center !important; }
-                    h1 { font-size: 3.5rem !important; }
-                }
 
                 @keyframes pulse {
                     0% { transform: scale(1); opacity: 1; }

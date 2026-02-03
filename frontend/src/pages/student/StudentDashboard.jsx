@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, BookOpen, Trophy, Activity, Clock,
     ArrowRight, Search, Zap, Award, User, Bell,
-    ChevronRight, Target, Flame, LogOut
+    ChevronRight, Target, Flame, LogOut, Menu, X, Sparkles
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
@@ -18,6 +18,7 @@ const StudentDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [user, setUser] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -69,7 +70,7 @@ const StudentDashboard = () => {
 
     const NavButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => setActiveTab(id)}
+            onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
             className={`nav-btn ${activeTab === id ? 'active' : ''}`}
         >
             <Icon size={20} />
@@ -95,10 +96,30 @@ const StudentDashboard = () => {
 
     return (
         <div className="dashboard-container">
+            {/* Mobile Overlay */}
+            <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
+
             {/* Sidebar */}
-            <div className="dashboard-sidebar">
-                <div style={{ padding: '0 1.5rem 2.5rem' }} className="hide-on-mobile">
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '1.5rem' }}>Learning Path</div>
+            <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+                <div style={{ padding: '2rem 1.5rem 1rem', display: 'flex', alignItems: 'center', justifyItems: 'space-between', width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '35px', height: '35px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Brain size={20} color="white" />
+                        </div>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '-0.5px', color: '#fff' }}>QuizeMaster</span>
+                    </div>
+                    <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <X size={24} />
+                    </button>
+                </div>
+
+                <div style={{ padding: '0 1.5rem 1.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                        Student Portal
+                    </div>
+                </div>
+
+                <div style={{ padding: '0 1.5rem 2.5rem' }} className="nav-items-container">
                     <NavButton id="overview" label="My Overview" icon={LayoutDashboard} />
                     <NavButton id="exams" label="Available Exams" icon={BookOpen} />
                     <NavButton id="history" label="Result History" icon={Activity} />
@@ -115,7 +136,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 'auto', padding: '1.5rem' }} className="hide-on-mobile">
+                <div style={{ marginTop: 'auto', padding: '1.5rem', width: '100%' }}>
                     <button
                         onClick={handleLogout}
                         className="btn-danger-soft"
@@ -132,6 +153,14 @@ const StudentDashboard = () => {
 
             {/* Main Content */}
             <div className="dashboard-content">
+                <button
+                    className="mobile-menu-btn hide-on-desktop"
+                    onClick={() => setSidebarOpen(true)}
+                    style={{ display: 'none' }} // Controlled by CSS media queries
+                >
+                    <Menu size={24} />
+                </button>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
                     <div>
                         <h1 className="section-title">

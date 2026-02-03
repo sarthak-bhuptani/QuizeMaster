@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, Users, BookOpen, UserCheck, Trash2, CheckSquare,
-    LayoutDashboard, GraduationCap, FileText, Menu, X, Search, LogOut
+    LayoutDashboard, GraduationCap, Brain, Menu, X, Search, LogOut
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +18,7 @@ const AdminDashboard = () => {
     const [data, setData] = useState({ teachers: [], students: [], courses: [] });
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
 
     useEffect(() => {
         const admin = localStorage.getItem('admin');
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
         localStorage.removeItem('admin');
         navigate('/');
     };
+    /* ... existing functions ... */
 
     const loadAllData = async () => {
         setLoading(true);
@@ -63,7 +65,8 @@ const AdminDashboard = () => {
         }
     };
 
-    // Actions
+    // ... (keep approveTeacher, deleteEntity, filterData, StatCard, etc as is)
+
     const approveTeacher = async (id) => {
         try {
             await axios.put(`http://127.0.0.1:5001/api/admin/approve-teacher/${id}`);
@@ -81,7 +84,6 @@ const AdminDashboard = () => {
         } catch (err) { alert('Delete failed'); }
     };
 
-    // Filter Logic
     const filterData = (list) => {
         if (!searchTerm) return list;
         return list.filter(item =>
@@ -92,7 +94,7 @@ const AdminDashboard = () => {
 
     const TabButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => setActiveTab(id)}
+            onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
             className={`nav-btn ${activeTab === id ? 'active' : ''}`}
         >
             <Icon size={20} />
@@ -111,6 +113,8 @@ const AdminDashboard = () => {
             </div>
         </div>
     );
+
+    // ... (keep create teacher modal logic)
 
     const [showCreateTeacherModal, setShowCreateTeacherModal] = useState(false);
     const [newTeacher, setNewTeacher] = useState({
@@ -132,18 +136,35 @@ const AdminDashboard = () => {
 
     return (
         <div className="dashboard-container">
+            {/* Mobile Overlay */}
+            <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
 
             {/* Sidebar */}
-            <div className="dashboard-sidebar">
-                <div style={{ padding: '0 1.5rem 2rem' }}>
-                    <h2 style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }} className="nav-label">Admin Portal</h2>
+            <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+                <div style={{ padding: '2rem 1.5rem 1rem', display: 'flex', alignItems: 'center', justifyItems: 'space-between', width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '35px', height: '35px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Brain size={20} color="white" />
+                        </div>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '-0.5px', color: '#fff' }}>QuizeMaster</span>
+                    </div>
+                    <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <X size={24} />
+                    </button>
                 </div>
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+
+                <div style={{ padding: '0 1.5rem 1.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                        Admin Portal
+                    </div>
+                </div>
+
+                <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <TabButton id="overview" label="Overview" icon={LayoutDashboard} />
                     <TabButton id="students" label="Students" icon={Users} />
                     <TabButton id="teachers" label="Teachers" icon={GraduationCap} />
                     <TabButton id="courses" label="Quizzes" icon={BookOpen} />
-                </nav>
+                </div>
 
                 <div style={{ padding: '0 1.5rem', marginTop: 'auto', width: '100%' }}>
                     <button
@@ -162,6 +183,13 @@ const AdminDashboard = () => {
 
             {/* Main Content */}
             <div className="dashboard-content">
+                <button
+                    className="mobile-menu-btn hide-on-desktop"
+                    onClick={() => setSidebarOpen(true)}
+                    style={{ display: 'none' }} // Controlled by CSS media queries
+                >
+                    <Menu size={24} />
+                </button>
 
                 {/* Header Actions */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
@@ -210,7 +238,7 @@ const AdminDashboard = () => {
                                 </div>
 
                                 {/* Analytics Section */}
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
 
                                     {/* Growth Trends Chart */}
                                     <div className="glass-card" style={{ padding: '1.5rem' }}>

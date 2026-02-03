@@ -585,3 +585,138 @@ a {
     margin: 0 auto;
   }
 }
+
+/* Missing Utilities found in codebase */
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+/* Mobile Navigation Fixes - Slide-out Sidebar */
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: flex !important;
+    /* Show titles/logout in the slide-out menu */
+  }
+
+  .dashboard-container {
+    flex-direction: column;
+    padding-top: 60px;
+    overflow-x: hidden;
+  }
+
+  /* Sidebar Hidden by Default */
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    /* Standard width */
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.98);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
+    padding: 2rem 1rem;
+    z-index: 1000;
+    transform: translateX(-100%);
+    /* Hide off-screen */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Align left like desktop */
+    justify-content: flex-start;
+  }
+
+  /* Sidebar Open State */
+  .dashboard-sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Overlay for closing sidebar */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    /* Click-through when hidden */
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Hamburger Menu Button */
+  .mobile-menu-btn {
+    display: flex !important;
+    position: absolute;
+    top: 1.5rem;
+    /* Align with header */
+    left: 1rem;
+    z-index: 90;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem;
+    border-radius: 8px;
+    color: var(--text-primary);
+  }
+
+  /* Adjust Content Padding */
+  .dashboard-content {
+    margin-left: 0;
+    padding: 2rem 1.5rem;
+    padding-top: 5rem;
+    /* Space for the menu button/header */
+    width: 100%;
+  }
+
+  /* Stats grid single column */
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  /* Tables horizontally scrollable */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Reset Nav Button Styles for Sidebar Look */
+  .nav-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+    border-top: none;
+    width: 100%;
+  }
+
+  .show-on-mobile-flex {
+    display: flex !important;
+  }
+
+  .nav-label {
+    display: block !important;
+  }
+}

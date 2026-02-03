@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, Users, BookOpen, PlusCircle, Trash2, Edit,
-    CheckCircle, UserPlus, Search, GraduationCap, Trophy, ChevronRight, LogOut, Sparkles, Activity
+    CheckCircle, UserPlus, Search, GraduationCap, Trophy, ChevronRight, LogOut, Sparkles, Activity, Menu, X, Brain
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
@@ -18,6 +18,7 @@ const TeacherDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [showAIModal, setShowAIModal] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
 
     useEffect(() => {
         const user = localStorage.getItem('user');
@@ -30,6 +31,7 @@ const TeacherDashboard = () => {
         localStorage.removeItem('admin');
         navigate('/');
     };
+    /* ... existing functions ... */
 
     const loadTeacherData = async () => {
         setLoading(true);
@@ -49,6 +51,8 @@ const TeacherDashboard = () => {
         }
     };
 
+    // ... (keep handleDeleteCourse, handleAIQuizGenerated, avgScore, filterList, NavButton, StatCard as is - no changes needed there, just replacing structure around them)
+
     const handleDeleteCourse = async (id) => {
         if (!window.confirm("Delete this quiz and all its data?")) return;
         try {
@@ -59,17 +63,13 @@ const TeacherDashboard = () => {
 
     const handleAIQuizGenerated = async (quizQuestions, formData) => {
         try {
-            // 1. Create Course
             const courseRes = await axios.post('http://127.0.0.1:5001/api/exam/courses', {
                 course_name: formData.topic + ' (AI Generated)',
                 question_number: quizQuestions.length,
                 total_marks: quizQuestions.reduce((sum, q) => sum + (q.marks || 1), 0),
-                time_limit: Math.max(10, quizQuestions.length * 1.5) // Estimate 1.5 min per question
+                time_limit: Math.max(10, quizQuestions.length * 1.5)
             });
-
             const courseId = courseRes.data._id;
-
-            // 2. Add Questions
             for (const q of quizQuestions) {
                 await axios.post('http://127.0.0.1:5001/api/exam/questions', {
                     course_id: courseId,
@@ -82,12 +82,10 @@ const TeacherDashboard = () => {
                     marks: q.marks || 1
                 });
             }
-
             alert(`Quiz "${formData.topic}" created successfully with ${quizQuestions.length} questions!`);
             setShowAIModal(false);
             loadTeacherData();
             setActiveTab('quizzes');
-
         } catch (error) {
             console.error(error);
             alert("Failed to save generated quiz.");
@@ -107,7 +105,7 @@ const TeacherDashboard = () => {
 
     const NavButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => setActiveTab(id)}
+            onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
             className={`nav-btn ${activeTab === id ? 'active' : ''}`}
         >
             <Icon size={20} />
@@ -132,19 +130,37 @@ const TeacherDashboard = () => {
 
     return (
         <div className="dashboard-container">
+            {/* Mobile Overlay */}
+            <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
+
             {/* Sidebar */}
-            <div className="dashboard-sidebar">
-                <div style={{ padding: '0 1.5rem 2rem' }}>
-                    <h2 style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }} className="nav-label">Teacher Portal</h2>
+            <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+                <div style={{ padding: '2rem 1.5rem 1rem', display: 'flex', alignItems: 'center', justifyItems: 'space-between', width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '35px', height: '35px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Brain size={20} color="white" />
+                        </div>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '-0.5px', color: '#fff' }}>QuizeMaster</span>
+                    </div>
+                    <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <X size={24} />
+                    </button>
                 </div>
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+
+                <div style={{ padding: '0 1.5rem 1.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                        Teacher Portal
+                    </div>
+                </div>
+
+                <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <NavButton id="overview" label="Dashboard" icon={LayoutDashboard} />
                     <NavButton id="quizzes" label="My Quizzes" icon={BookOpen} />
                     <NavButton id="students" label="Students" icon={Users} />
                     <NavButton id="results" label="Results" icon={Trophy} />
-                </nav>
+                </div>
 
-                <div style={{ padding: '0 1.5rem', marginTop: 'auto', width: '100%' }}>
+                <div style={{ padding: '0 1.5rem', marginTop: 'auto', width: '100%' }} className="hide-on-mobile">
                     <button
                         onClick={handleLogout}
                         className="btn-danger-soft"
@@ -161,6 +177,14 @@ const TeacherDashboard = () => {
 
             {/* Main Content */}
             <div className="dashboard-content">
+                <button
+                    className="mobile-menu-btn hide-on-desktop"
+                    onClick={() => setSidebarOpen(true)}
+                    style={{ display: 'none' }} // Controlled by CSS media queries
+                >
+                    <Menu size={24} />
+                </button>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem' }}>
                     <div>
                         <h1 className="section-title">
