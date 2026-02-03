@@ -4,7 +4,7 @@ import {
     LayoutDashboard, Users, BookOpen, PlusCircle, Trash2, Edit,
     CheckCircle, UserPlus, Search, GraduationCap, Trophy, ChevronRight, LogOut, Sparkles, Activity, Menu, X, Brain
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import AIQuizGenerator from './AIQuizGenerator';
@@ -37,9 +37,9 @@ const TeacherDashboard = () => {
         setLoading(true);
         try {
             const [courseRes, studentRes, resultRes] = await Promise.all([
-                axios.get('http://127.0.0.1:5001/api/exam/courses'),
-                axios.get('http://127.0.0.1:5001/api/student'),
-                axios.get('http://127.0.0.1:5001/api/exam/results')
+                api.get('/exam/courses'),
+                api.get('/student'),
+                api.get('/exam/results')
             ]);
             setCourses(courseRes.data);
             setStudents(studentRes.data);
@@ -56,14 +56,14 @@ const TeacherDashboard = () => {
     const handleDeleteCourse = async (id) => {
         if (!window.confirm("Delete this quiz and all its data?")) return;
         try {
-            await axios.delete(`http://127.0.0.1:5001/api/exam/courses/${id}`);
+            await api.delete(`/exam/courses/${id}`);
             loadTeacherData();
         } catch (err) { alert("Failed to delete"); }
     };
 
     const handleAIQuizGenerated = async (quizQuestions, formData) => {
         try {
-            const courseRes = await axios.post('http://127.0.0.1:5001/api/exam/courses', {
+            const courseRes = await api.post('/exam/courses', {
                 course_name: formData.topic + ' (AI Generated)',
                 question_number: quizQuestions.length,
                 total_marks: quizQuestions.reduce((sum, q) => sum + (q.marks || 1), 0),
@@ -71,7 +71,7 @@ const TeacherDashboard = () => {
             });
             const courseId = courseRes.data._id;
             for (const q of quizQuestions) {
-                await axios.post('http://127.0.0.1:5001/api/exam/questions', {
+                await api.post('/exam/questions', {
                     course_id: courseId,
                     question: q.question_text,
                     option1: q.options[0],

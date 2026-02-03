@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, HelpCircle, CheckCircle, Trash2, Edit2, Plus, X } from 'lucide-react';
 
@@ -27,7 +27,7 @@ const AddQuestion = () => {
 
     const fetchQuestions = async () => {
         try {
-            const res = await axios.get(`http://127.0.0.1:5001/api/exam/questions/${courseId}`);
+            const res = await api.get(`/exam/questions/${courseId}`);
             setQuestions(res.data);
         } catch (error) {
             console.error("Error fetching questions:", error);
@@ -44,14 +44,14 @@ const AddQuestion = () => {
         try {
             if (editId) {
                 // Update
-                await axios.put(`http://127.0.0.1:5001/api/exam/questions/${editId}`, {
+                await api.put(`/exam/questions/${editId}`, {
                     course_id: courseId,
                     ...formData
                 });
                 alert('Question Updated!');
             } else {
                 // Add
-                await axios.post('http://127.0.0.1:5001/api/exam/questions', {
+                await api.post('/exam/questions', {
                     course_id: courseId,
                     ...formData
                 });
@@ -71,7 +71,7 @@ const AddQuestion = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this question?")) return;
         try {
-            await axios.delete(`http://127.0.0.1:5001/api/exam/questions/${id}`);
+            await api.delete(`/exam/questions/${id}`);
             fetchQuestions();
         } catch (error) {
             console.error(error);

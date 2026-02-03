@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { motion } from 'framer-motion';
 import { CheckCircle, Circle, ArrowRight, Clock, AlertCircle, Shield, Activity, Lock, Zap, Target, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -175,13 +175,11 @@ const TakeQuiz = () => {
     const fetchQuizData = async () => {
         try {
             // Fetch questions
-            const qRes = await axios.get(`http://127.0.0.1:5001/api/exam/questions/${courseId}`);
+            const qRes = await api.get(`/exam/questions/${courseId}`);
             setQuestions(qRes.data);
 
             // Fetch course details (for time limit)
-            // Note: In a real app, you might want to fetch this singly or modify the questions API to return course metadata too.
-            // For now, let's assume we can get course info or default to 30 mins
-            const allCourses = await axios.get('http://127.0.0.1:5001/api/exam/courses');
+            const allCourses = await api.get('/exam/courses');
             const thisCourse = allCourses.data.find(c => c._id === courseId);
 
             if (thisCourse) {
@@ -258,7 +256,7 @@ const TakeQuiz = () => {
 
         if (user && (user.studentId || user._id)) {
             try {
-                const res = await axios.post('http://127.0.0.1:5001/api/exam/results', {
+                const res = await api.post('/exam/results', {
                     student_id: user.studentId || user._id, // Handle both ID formats
                     exam_id: courseId,
                     marks: totalScore,

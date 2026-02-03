@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckSquare, GraduationCap, Sparkles, Clock } from 'lucide-react';
 
@@ -18,7 +18,7 @@ const CreateQuiz = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://127.0.0.1:5001/api/exam/courses', {
+            await api.post('/exam/courses', {
                 ...formData,
                 question_number: 0,
                 total_marks: 0

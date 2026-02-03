@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, BookOpen, Trophy, Activity, Clock,
     ArrowRight, Search, Zap, Award, User, Bell,
-    ChevronRight, Target, Flame, LogOut, Menu, X, Sparkles
+    ChevronRight, Target, Flame, LogOut, Menu, X, Sparkles, Brain
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
@@ -41,9 +41,9 @@ const StudentDashboard = () => {
         setLoading(true);
         try {
             const [courseRes, resultRes, leaderboardRes] = await Promise.all([
-                axios.get('http://127.0.0.1:5001/api/exam/courses'),
-                axios.get(`http://127.0.0.1:5001/api/exam/results/student/${studentId}`),
-                axios.get('http://127.0.0.1:5001/api/exam/results')
+                api.get('/exam/courses'),
+                api.get(`/exam/results/student/${studentId}`),
+                api.get('/exam/results')
             ]);
             setCourses(courseRes.data);
             setMyResults(resultRes.data);

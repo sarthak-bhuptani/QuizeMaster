@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, ArrowLeft, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -18,12 +18,12 @@ const ExamAnalysis = () => {
 
     const fetchResult = async () => {
         try {
-            const res = await axios.get(`http://127.0.0.1:5001/api/exam/results/${resultId}`);
+            const res = await api.get(`/exam/results/${resultId}`);
             const found = res.data;
 
             if (found) {
                 // Fetch full questions to map ID to Text
-                const qRes = await axios.get(`http://127.0.0.1:5001/api/exam/questions/${found.exam_id._id}`);
+                const qRes = await api.get(`/exam/questions/${found.exam_id._id}`);
                 const fullResult = {
                     ...found,
                     answers: found.answers.map(ans => {

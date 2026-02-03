@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, BookOpen, Clock, BarChart, ArrowRight, X, CheckCircle, Loader2, Save } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const AIQuizGenerator = ({ onClose, onQuizGenerated }) => {
@@ -20,7 +20,7 @@ const AIQuizGenerator = ({ onClose, onQuizGenerated }) => {
         setError('');
 
         try {
-            const res = await axios.post('http://127.0.0.1:5001/api/ai/generate-quiz', {
+            const res = await api.post('/ai/generate-quiz', {
                 topic: formData.topic,
                 difficulty: formData.difficulty,
                 questionCount: formData.count

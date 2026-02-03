@@ -4,7 +4,7 @@ import {
     Shield, Users, BookOpen, UserCheck, Trash2, CheckSquare,
     LayoutDashboard, GraduationCap, Brain, Menu, X, Search, LogOut
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -36,11 +36,11 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             // Fetch Stats
-            const statsRes = await axios.get('http://127.0.0.1:5001/api/admin/stats');
+            const statsRes = await api.get('/admin/stats');
             setStats(statsRes.data);
 
             // Fetch System Data (Students, Teachers, Courses)
-            const sysRes = await axios.get('http://127.0.0.1:5001/api/admin/system-data');
+            const sysRes = await api.get('/admin/system-data');
             const { teachers = [], students = [], courses = [], questions = [] } = sysRes.data;
 
             // Dynamically calculate accurate counts/marks for courses
@@ -69,7 +69,7 @@ const AdminDashboard = () => {
 
     const approveTeacher = async (id) => {
         try {
-            await axios.put(`http://127.0.0.1:5001/api/admin/approve-teacher/${id}`);
+            await api.put(`/admin/approve-teacher/${id}`);
             alert('Teacher Approved');
             loadAllData();
         } catch (err) { alert('Action failed'); }
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
     const deleteEntity = async (type, id) => {
         if (!window.confirm(`Are you sure you want to delete this ${type}?`)) return;
         try {
-            await axios.delete(`http://127.0.0.1:5001/api/admin/delete-${type}/${id}`);
+            await api.delete(`/admin/delete-${type}/${id}`);
             alert(`${type} deleted`);
             loadAllData();
         } catch (err) { alert('Delete failed'); }
@@ -124,7 +124,7 @@ const AdminDashboard = () => {
     const handleCreateTeacher = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://127.0.0.1:5001/api/teacher/signup', { ...newTeacher, status: true });
+            await api.post('/teacher/signup', { ...newTeacher, status: true });
             alert('Teacher Created Successfully');
             setShowCreateTeacherModal(false);
             setNewTeacher({ first_name: '', last_name: '', username: '', password: '', mobile: '', address: '' });
