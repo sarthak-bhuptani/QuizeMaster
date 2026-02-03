@@ -23,12 +23,19 @@ app.use((req, res, next) => {
 
 // Database Connection
 const PORT = process.env.PORT || 5000;
-// Default to local if no env provided, but user asked for Atlas.
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/onlinequiz';
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+    console.error('CRITICAL: MONGO_URI is not defined in environment variables!');
+}
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('MongoDB connected successfully'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => {
+        console.error('MongoDB connection error details:', err.message);
+        // Don't crash the server, just log it. 
+        // Requests that need DB will fail with a 500 then, but we can see why.
+    });
 
 // Routes
 const studentRoutes = require('./routes/student');
