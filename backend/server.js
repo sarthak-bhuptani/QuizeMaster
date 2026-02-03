@@ -22,20 +22,30 @@ app.use((req, res, next) => {
 });
 
 // Database Connection
-const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-    console.error('CRITICAL: MONGO_URI is not defined in environment variables!');
+    console.error('MONGO_URI is missing');
 }
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB connected successfully'))
-    .catch(err => {
-        console.error('MongoDB connection error details:', err.message);
-        // Don't crash the server, just log it. 
-        // Requests that need DB will fail with a 500 then, but we can see why.
-    });
+// Optimization for Vercel: cached connection
+let isConnected = false;
+const connectDB = async () => {
+    if (isConnected) return;
+    try {
+        await mongoose.connect(MONGO_URI);
+        isConnected = true;
+        console.log('MongoDB Connected');
+    } catch (err) {
+        console.error('DB Connection Error:', err.message);
+    }
+};
+
+// Middleware to ensure DB is connected
+app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+});
 
 // Routes
 const studentRoutes = require('./routes/student');
@@ -59,6 +69,8 @@ require('./models/Student');
 require('./models/Course');
 require('./models/Question');
 require('./models/Result');
+
+const PORT = process.env.PORT || 5001;
 
 // Start Server
 if (process.env.NODE_ENV !== 'production') {
