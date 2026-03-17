@@ -10,7 +10,9 @@ const AIQuizGenerator = ({ onClose, onQuizGenerated }) => {
     const [formData, setFormData] = useState({
         topic: '',
         difficulty: 'Medium',
-        count: 5
+        count: 5,
+        marksPerQuestion: 5,
+        timeLimit: 30
     });
     const [error, setError] = useState('');
 
@@ -25,7 +27,7 @@ const AIQuizGenerator = ({ onClose, onQuizGenerated }) => {
                 difficulty: formData.difficulty,
                 questionCount: formData.count
             });
-            onQuizGenerated(res.data, formData);
+            onQuizGenerated(res.data, formData); // formData now includes marksPerQuestion
             onClose(); // Close modal on success
         } catch (err) {
             console.error(err);
@@ -74,17 +76,17 @@ const AIQuizGenerator = ({ onClose, onQuizGenerated }) => {
                                 onChange={e => setFormData({ ...formData, topic: e.target.value })}
                                 required
                                 autoFocus
-                                style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
+                                style={{ width: '100%', padding: '1rem', background: 'rgba(15,23,42,0.08)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-primary)' }}
                             />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Difficulty</label>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Difficulty</label>
                                 <select
                                     value={formData.difficulty}
                                     onChange={e => setFormData({ ...formData, difficulty: e.target.value })}
-                                    style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
+                                    style={{ width: '100%', padding: '1rem', background: 'rgba(15,23,42,0.08)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-primary)' }}
                                 >
                                     <option value="Easy">Easy</option>
                                     <option value="Medium">Medium</option>
@@ -93,16 +95,39 @@ const AIQuizGenerator = ({ onClose, onQuizGenerated }) => {
                                 </select>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Number of Questions</label>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.4px' }}>No. of Questions</label>
                                 <input
                                     type="number"
                                     min="1"
                                     max="20"
                                     value={formData.count}
                                     onChange={e => setFormData({ ...formData, count: e.target.value })}
-                                    style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
+                                    style={{ width: '100%', padding: '1rem', background: 'rgba(15,23,42,0.08)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-primary)' }}
                                 />
                             </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: '#f59e0b', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Marks / Question</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="100"
+                                    value={formData.marksPerQuestion}
+                                    onChange={e => setFormData({ ...formData, marksPerQuestion: parseInt(e.target.value) || 1 })}
+                                    style={{ width: '100%', padding: '1rem', background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.4)', borderRadius: '12px', color: 'var(--text-primary)' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Duration (minutes)</label>
+                            <input
+                                type="number"
+                                min="5"
+                                max="180"
+                                value={formData.timeLimit}
+                                onChange={e => setFormData({ ...formData, timeLimit: parseInt(e.target.value) || 5 })}
+                                style={{ width: '100%', padding: '1rem', background: 'rgba(15,23,42,0.08)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-primary)' }}
+                            />
                         </div>
                     </div>
 

@@ -80,6 +80,8 @@ const Profile = () => {
                 const id = userData?._id;
                 await api.put(`/${role}/${id}`, { profile_pic: base64String });
                 setUserData({ ...userData, profile_pic: base64String });
+                // Update Navbar avatar instantly
+                window.dispatchEvent(new CustomEvent('profilePicUpdated', { detail: { profile_pic: base64String } }));
                 setMessage({ type: 'success', text: 'Profile picture updated!' });
             } catch (err) {
                 setMessage({ type: 'error', text: 'Failed to upload image' });

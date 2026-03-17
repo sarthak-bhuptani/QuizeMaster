@@ -277,27 +277,36 @@ const StudentDashboard = () => {
                                         style={{ paddingLeft: '3.5rem' }}
                                     />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                                    {courses.filter(c => c.course_name.toLowerCase().includes(searchTerm.toLowerCase())).map(course => (
-                                        <div key={course._id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '15px', background: 'var(--primary-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontWeight: 800, fontSize: '1.5rem' }}>
-                                                {course.course_name[0]}
-                                            </div>
-                                            <div>
-                                                <h3 style={{ margin: 0, marginBottom: '0.5rem' }}>{course.course_name}</h3>
-                                                <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem' }} className="text-secondary">
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={14} /> {course.time_limit}m</div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Target size={14} /> {course.total_marks} Pts</div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><BookOpen size={14} /> {course.question_number}q</div>
+                                <div className="exam-cards-grid">
+                                    {courses.filter(c => c.course_name.toLowerCase().includes(searchTerm.toLowerCase())).map((course, idx) => {
+                                        const accents = ['#6366f1','#0ea5e9','#10b981','#f59e0b','#ec4899','#f97316'];
+                                        const accent = accents[idx % accents.length];
+                                        const alreadyDone = myResults.some(r => r.exam_id?._id === course._id || r.exam_id === course._id);
+                                        return (
+                                            <div key={course._id} className="exam-card-simple" style={{ borderLeftColor: accent }}>
+                                                <div className="exam-card-simple-top">
+                                                    <div className="exam-card-icon" style={{ background: `${accent}18`, color: accent }}>
+                                                        {course.course_name[0].toUpperCase()}
+                                                    </div>
+                                                    {alreadyDone && <span className="exam-attempted-tag">Done</span>}
                                                 </div>
+
+                                                <h3 className="exam-card-name">{course.course_name}</h3>
+
+                                                <div className="exam-card-meta">
+                                                    <span><Clock size={13} /> {course.time_limit} min</span>
+                                                    <span><Target size={13} /> {course.total_marks} pts</span>
+                                                    <span><BookOpen size={13} /> {course.question_number} Qs</span>
+                                                </div>
+
+                                                <Link to={`/student/take-quiz/${course._id}`}>
+                                                    <button className="exam-card-btn" style={{ borderColor: accent, color: accent }}>
+                                                        {alreadyDone ? 'Retake' : 'Start Exam'} <ArrowRight size={15} />
+                                                    </button>
+                                                </Link>
                                             </div>
-                                            <Link to={`/student/take-quiz/${course._id}`} style={{ marginTop: 'auto' }}>
-                                                <button className="btn btn-primary" style={{ width: '100%' }}>
-                                                    Begin Exam <ArrowRight size={18} />
-                                                </button>
-                                            </Link>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </>
                         )}

@@ -12,6 +12,7 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const [user, setUser] = useState(null);
+    const [profilePic, setProfilePic] = useState(null);
     const [scrolled, setScrolled] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showLoginMenu, setShowLoginMenu] = useState(false);
@@ -37,12 +38,34 @@ const Navbar = () => {
                 else if (parsed.studentId) parsed.role = 'Student';
             }
             setUser(parsed);
+
+            // Fetch profile pic
+            const role = parsed.teacherId ? 'teacher' : 'student';
+            const id = parsed.teacherId || parsed.studentId;
+            if (id) {
+                fetch(`http://localhost:5001/api/${role}/${id}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data?.profile_pic) setProfilePic(data.profile_pic);
+                        else setProfilePic(null);
+                    })
+                    .catch(() => setProfilePic(null));
+            }
         } else if (adminData) {
             setUser({ ...JSON.parse(adminData), role: 'Admin' });
         } else {
             setUser(null);
         }
     }, [location.pathname]);
+
+    // Listen for profile pic updates from Profile page
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.detail?.profile_pic) setProfilePic(e.detail.profile_pic);
+        };
+        window.addEventListener('profilePicUpdated', handler);
+        return () => window.removeEventListener('profilePicUpdated', handler);
+    }, []);
 
     useEffect(() => {
         setMobileMenuOpen(false);
@@ -119,7 +142,10 @@ const Navbar = () => {
                             <div className="nav-profile-wrapper" ref={profileMenuRef} style={{ position: 'relative' }}>
                                 <button className="user-pill hide-on-mobile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
                                     <div className="pill-avatar">
-                                        {(user.name || user.username || 'U').charAt(0).toUpperCase()}
+                                        {profilePic
+                                            ? <img src={profilePic} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                            : (user.name || user.username || 'U').charAt(0).toUpperCase()
+                                        }
                                     </div>
                                     <span className="pill-info">{user.name || user.username}</span>
                                     <ChevronDown size={14} />
@@ -133,9 +159,14 @@ const Navbar = () => {
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                             className="dropdown-glass"
                                         >
-                                            <div className="dropdown-header">
-                                                <span className="user-name">{user.name || user.username}</span>
-                                                <span className="user-role">{user.role} Portal</span>
+                                            <div className="dropdown-header" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                {profilePic && (
+                                                    <img src={profilePic} alt="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                                                )}
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                    <span className="user-name">{user.name || user.username}</span>
+                                                    <span className="user-role">{user.role} Portal</span>
+                                                </div>
                                             </div>
                                             <button onClick={() => navigate('/profile')} className="dropdown-link">
                                                 <UserCircle size={18} /> Profile Setting
@@ -230,7 +261,10 @@ const Navbar = () => {
                                     <div className="mobile-user-card">
                                         <div className="user-card-head">
                                             <div className="pill-avatar large">
-                                                {(user.name || user.username || 'U').charAt(0).toUpperCase()}
+                                                {profilePic
+                                                    ? <img src={profilePic} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                                    : (user.name || user.username || 'U').charAt(0).toUpperCase()
+                                                }
                                             </div>
                                             <div className="user-card-info">
                                                 <div className="user-card-name">{user.name || user.username}</div>

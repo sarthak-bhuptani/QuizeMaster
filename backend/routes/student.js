@@ -155,6 +155,7 @@ router.put('/:id', async (req, res) => {
         await student.save();
         res.json({ message: 'Profile updated successfully', student });
     } catch (error) {
+        console.error('UPDATE_STUDENT_ERROR:', error.name, '-', error.message);
         res.status(500).json({ message: 'Error updating profile', error: error.message });
     }
 });

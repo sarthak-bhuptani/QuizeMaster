@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, HelpCircle, CheckCircle, Trash2, Edit2, Plus, X } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Edit2, Plus, X, CheckCircle } from 'lucide-react';
 
 const AddQuestion = () => {
     const { courseId } = useParams();
@@ -10,6 +9,7 @@ const AddQuestion = () => {
     const [questions, setQuestions] = useState([]);
     const [editId, setEditId] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [toast, setToast] = useState('');
 
     const [formData, setFormData] = useState({
         question: '',
@@ -21,61 +21,53 @@ const AddQuestion = () => {
         marks: ''
     });
 
-    useEffect(() => {
-        fetchQuestions();
-    }, [courseId]);
+    useEffect(() => { fetchQuestions(); }, [courseId]);
 
     const fetchQuestions = async () => {
         try {
             const res = await api.get(`/exam/questions/${courseId}`);
             setQuestions(res.data);
         } catch (error) {
-            console.error("Error fetching questions:", error);
+            console.error('Error fetching questions:', error);
         }
     };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const showToast = (msg) => {
+        setToast(msg);
+        setTimeout(() => setToast(''), 3000);
     };
+
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             if (editId) {
-                // Update
-                await api.put(`/exam/questions/${editId}`, {
-                    course_id: courseId,
-                    ...formData
-                });
-                alert('Question Updated!');
+                await api.put(`/exam/questions/${editId}`, { course_id: courseId, ...formData });
+                showToast('Question updated successfully!');
             } else {
-                // Add
-                await api.post('/exam/questions', {
-                    course_id: courseId,
-                    ...formData
-                });
-                alert('Question Added!');
+                await api.post('/exam/questions', { course_id: courseId, ...formData });
+                showToast('Question added successfully!');
             }
-
             resetForm();
             fetchQuestions();
         } catch (error) {
             console.error('Error saving question:', error);
-            alert('Failed to save question');
+            showToast('Failed to save question.');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Delete this question?")) return;
+        if (!window.confirm('Delete this question?')) return;
         try {
             await api.delete(`/exam/questions/${id}`);
             fetchQuestions();
+            showToast('Question deleted.');
         } catch (error) {
-            console.error(error);
-            alert("Failed to delete");
+            showToast('Failed to delete.');
         }
     };
 
@@ -94,174 +86,245 @@ const AddQuestion = () => {
     };
 
     const resetForm = () => {
-        setFormData({
-            question: '',
-            option1: '',
-            option2: '',
-            option3: '',
-            option4: '',
-            answer: 'Option1',
-            marks: ''
-        });
+        setFormData({ question: '', option1: '', option2: '', option3: '', option4: '', answer: 'Option1', marks: '' });
         setEditId(null);
     };
 
-    return (
-        <div className="manage-container">
-            <style>{`
-                .manage-container { padding: 8rem 2rem 4rem; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
-                .glass-card {
-                    background: rgba(30, 41, 59, 0.4);
-                    backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 20px;
-                }
-                .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
-                .question-item {
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.05);
-                    border-radius: 12px;
-                    padding: 1rem;
-                    margin-bottom: 1rem;
-                    transition: all 0.2s;
-                }
-                .question-item:hover { transform: translateX(5px); background: rgba(255,255,255,0.05); }
-                .btn-icon { padding: 0.5rem; border-radius: 8px; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-                .btn-edit { background: rgba(99, 102, 241, 0.1); color: #818cf8; }
-                .btn-delete { background: rgba(239, 68, 68, 0.1); color: #f87171; }
-                .btn-edit:hover { background: rgba(99, 102, 241, 0.2); }
-                .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
-                
-                @media (max-width: 900px) {
-                    .manage-container { padding: 4rem 1rem 1rem; }
-                    .grid-layout { grid-template-columns: 1fr; gap: 1rem; }
-                    .form-section { order: 1; position: static !important; }
-                    .list-section { order: 2; margin-top: 1rem; }
-                    .options-grid { grid-template-columns: 1fr !important; }
-                }
-            `}</style>
+    const answerLabel = { Option1: 'A', Option2: 'B', Option3: 'C', Option4: 'D' };
 
-            <div className="flex-mobile-column" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
-                <motion.button
-                    whileHover={{ x: -5 }}
+    return (
+        <div style={{ padding: '6rem 2rem 4rem', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh', fontFamily: 'inherit' }}>
+
+            {/* Toast */}
+            {toast && (
+                <div style={{
+                    position: 'fixed', bottom: '2rem', right: '2rem', background: '#0f172a',
+                    color: 'white', padding: '0.85rem 1.5rem', borderRadius: '12px',
+                    display: 'flex', alignItems: 'center', gap: '0.6rem',
+                    fontSize: '0.9rem', fontWeight: 600, zIndex: 9999,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+                }}>
+                    <CheckCircle size={16} color="#34d399" /> {toast}
+                </div>
+            )}
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <button
                     onClick={() => navigate('/teacher-dashboard')}
-                    style={{ background: 'transparent', border: 'none', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+                    style={{ background: 'none', border: 'none', color: '#6366f1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.95rem' }}
                 >
-                    <ArrowLeft size={20} /> Back to Dashboard
-                </motion.button>
-                <h2 style={{ margin: 0, fontSize: window.innerWidth < 600 ? '1.5rem' : '2rem' }}>Manage Questions</h2>
+                    <ArrowLeft size={18} /> Back to Dashboard
+                </button>
+                <div>
+                    <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>Manage Questions</h1>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Add, edit or remove questions for this quiz.</p>
+                </div>
             </div>
 
-            <div className="grid-layout">
-                {/* FORM SECTION */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="glass-card form-section"
-                    style={{ padding: '2rem', position: 'sticky', top: '100px' }}
-                >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <div style={{ background: 'rgba(99, 102, 241, 0.2)', padding: '0.8rem', borderRadius: '12px' }}>
-                                {editId ? <Edit2 size={24} color="#818cf8" /> : <Plus size={24} color="#818cf8" />}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
+
+                {/* ── Form ── */}
+                <div style={{
+                    background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px',
+                    padding: '2rem', position: 'sticky', top: '90px',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.05)'
+                }}>
+                    {/* Form Header */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ background: '#eef2ff', padding: '0.6rem', borderRadius: '10px' }}>
+                                {editId ? <Edit2 size={20} color="#6366f1" /> : <Plus size={20} color="#6366f1" />}
                             </div>
-                            <h3 style={{ margin: 0 }}>{editId ? 'Edit Question' : 'Add New Question'}</h3>
+                            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+                                {editId ? 'Edit Question' : 'Add New Question'}
+                            </h3>
                         </div>
                         {editId && (
-                            <button onClick={resetForm} style={{ background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', padding: '0.3rem 0.8rem', borderRadius: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem' }}>
-                                <X size={14} /> Cancel
+                            <button onClick={resetForm} style={{
+                                background: 'none', border: '1.5px solid #cbd5e1', color: '#64748b',
+                                padding: '4px 12px', borderRadius: '100px', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600
+                            }}>
+                                <X size={13} /> Cancel
                             </button>
                         )}
                     </div>
 
-                    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.2rem' }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
+                        {/* Question */}
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Question Text</label>
+                            <label style={labelStyle}>Question Text</label>
                             <textarea
                                 name="question"
                                 value={formData.question}
                                 onChange={handleChange}
                                 required
-                                style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', fontFamily: 'inherit', minHeight: '80px' }}
+                                rows={3}
+                                placeholder="Enter the question..."
+                                style={inputStyle({ multiline: true })}
                             />
                         </div>
 
-                        <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                            {['option1', 'option2', 'option3', 'option4'].map((opt, i) => (
+                        {/* Options 2x2 */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                            {['option1','option2','option3','option4'].map((opt, i) => (
                                 <div key={opt}>
+                                    <label style={labelStyle}>Option {String.fromCharCode(65 + i)}</label>
                                     <input
                                         type="text"
                                         name={opt}
-                                        placeholder={`Option ${i + 1}`}
+                                        placeholder={`Option ${String.fromCharCode(65 + i)}`}
                                         value={formData[opt]}
                                         onChange={handleChange}
                                         required
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                        style={inputStyle()}
                                     />
                                 </div>
                             ))}
                         </div>
 
-                        <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        {/* Correct Answer + Marks */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Correct Answer</label>
-                                <select name="answer" value={formData.answer} onChange={handleChange} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>
-                                    <option value="Option1">Option 1</option>
-                                    <option value="Option2">Option 2</option>
-                                    <option value="Option3">Option 3</option>
-                                    <option value="Option4">Option 4</option>
+                                <label style={labelStyle}>Correct Answer</label>
+                                <select name="answer" value={formData.answer} onChange={handleChange} style={inputStyle()}>
+                                    <option value="Option1">Option A</option>
+                                    <option value="Option2">Option B</option>
+                                    <option value="Option3">Option C</option>
+                                    <option value="Option4">Option D</option>
                                 </select>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Marks</label>
-                                <input type="number" name="marks" value={formData.marks} onChange={handleChange} required style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }} />
+                                <label style={labelStyle}>Marks for this Question</label>
+                                <input
+                                    type="number"
+                                    name="marks"
+                                    placeholder="e.g. 5"
+                                    min="1"
+                                    value={formData.marks}
+                                    onChange={handleChange}
+                                    required
+                                    style={inputStyle()}
+                                />
                             </div>
                         </div>
 
-                        <button type="submit" className="btn-primary" disabled={loading} style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', color: 'white', border: 'none', padding: '1rem', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '0.5rem', opacity: loading ? 0.7 : 1 }}>
-                            <Save size={18} /> {loading ? 'Saving...' : editId ? 'Update Question' : 'Save Question'}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                marginTop: '0.25rem', padding: '0.9rem', borderRadius: '10px',
+                                background: loading ? '#a5b4fc' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                color: 'white', border: 'none', fontWeight: 700, fontSize: '0.95rem',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
+                            }}
+                        >
+                            <Save size={17} /> {loading ? 'Saving...' : editId ? 'Update Question' : 'Save Question'}
                         </button>
                     </form>
-                </motion.div>
+                </div>
 
-                {/* LIST SECTION */}
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="list-section">
-                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        Existing Questions <span style={{ background: '#334155', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.8rem' }}>{questions.length}</span>
-                    </h3>
+                {/* ── Question List ── */}
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>Existing Questions</h3>
+                        <span style={{ background: '#6366f1', color: 'white', fontSize: '0.75rem', fontWeight: 700, padding: '2px 10px', borderRadius: '100px' }}>
+                            {questions.length}
+                        </span>
+                    </div>
 
                     {questions.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px' }}>
-                            No questions added yet.
+                        <div style={{
+                            textAlign: 'center', padding: '3rem', color: '#94a3b8',
+                            border: '2px dashed #e2e8f0', borderRadius: '14px',
+                            background: '#f8fafc'
+                        }}>
+                            <Plus size={32} color="#cbd5e1" style={{ marginBottom: '0.5rem' }} />
+                            <p style={{ margin: 0 }}>No questions added yet. Add your first one!</p>
                         </div>
                     ) : (
-                        questions.map((q, i) => (
-                            <div key={q._id} className="question-item">
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                    <span style={{ fontWeight: 'bold', color: '#cbd5e1' }}>Q{i + 1}.</span>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button onClick={() => handleEdit(q)} className="btn-icon btn-edit" title="Edit"><Edit2 size={16} /></button>
-                                        <button onClick={() => handleDelete(q._id)} className="btn-icon btn-delete" title="Delete"><Trash2 size={16} /></button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                            {questions.map((q, i) => (
+                                <div key={q._id} style={{
+                                    background: '#fff', border: '1px solid #e2e8f0',
+                                    borderLeft: '4px solid #6366f1', borderRadius: '12px',
+                                    padding: '1.1rem 1.25rem',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.6rem' }}>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            Q{i + 1} · {q.marks} {q.marks === 1 ? 'Mark' : 'Marks'}
+                                        </span>
+                                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                            <button onClick={() => handleEdit(q)} title="Edit" style={iconBtnStyle('#eef2ff', '#6366f1')}><Edit2 size={15} /></button>
+                                            <button onClick={() => handleDelete(q._id)} title="Delete" style={iconBtnStyle('#fef2f2', '#ef4444')}><Trash2 size={15} /></button>
+                                        </div>
+                                    </div>
+
+                                    <p style={{ margin: '0 0 0.85rem', fontWeight: 600, color: '#0f172a', lineHeight: 1.5, fontSize: '0.95rem' }}>{q.question}</p>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                                        {['option1','option2','option3','option4'].map((opt, idx) => {
+                                            const isCorrect = q.answer === `Option${idx + 1}`;
+                                            return (
+                                                <div key={opt} style={{
+                                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                                    padding: '5px 10px', borderRadius: '8px',
+                                                    background: isCorrect ? '#ecfdf5' : '#f8fafc',
+                                                    border: `1px solid ${isCorrect ? '#6ee7b7' : '#e2e8f0'}`,
+                                                    fontSize: '0.82rem', fontWeight: isCorrect ? 700 : 500,
+                                                    color: isCorrect ? '#059669' : '#475569'
+                                                }}>
+                                                    {isCorrect && <CheckCircle size={12} />}
+                                                    <span style={{ minWidth: '14px', fontWeight: 700 }}>{String.fromCharCode(65 + idx)}.</span>
+                                                    {q[opt]}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
-                                <p style={{ margin: '0 0 1rem 0', fontSize: '1.1rem' }}>{q.question}</p>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.9rem', color: '#94a3b8' }}>
-                                    <div style={{ color: q.answer === 'Option1' ? '#34d399' : 'inherit' }}>A: {q.option1}</div>
-                                    <div style={{ color: q.answer === 'Option2' ? '#34d399' : 'inherit' }}>B: {q.option2}</div>
-                                    <div style={{ color: q.answer === 'Option3' ? '#34d399' : 'inherit' }}>C: {q.option3}</div>
-                                    <div style={{ color: q.answer === 'Option4' ? '#34d399' : 'inherit' }}>D: {q.option4}</div>
-                                </div>
-                                <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#64748b', display: 'flex', gap: '1rem' }}>
-                                    <span>Marks: {q.marks}</span>
-                                    <span>Answer: {q.answer}</span>
-                                </div>
-                            </div>
-                        ))
+                            ))}
+                        </div>
                     )}
-                </motion.div>
+                </div>
             </div>
+
+            {/* Responsive */}
+            <style>{`
+                @media (max-width: 900px) {
+                    div[style*="grid-template-columns: 1fr 1fr"] {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 };
+
+const labelStyle = {
+    display: 'block', marginBottom: '5px',
+    fontSize: '0.8rem', fontWeight: 700,
+    color: '#475569', textTransform: 'uppercase', letterSpacing: '0.4px'
+};
+
+const inputStyle = (opts = {}) => ({
+    width: '100%', padding: '0.75rem 0.9rem',
+    border: '1.5px solid #e2e8f0', borderRadius: '8px',
+    background: '#f8fafc', color: '#0f172a',
+    fontSize: '0.9rem', fontFamily: 'inherit',
+    boxSizing: 'border-box',
+    resize: opts.multiline ? 'vertical' : 'none',
+    outline: 'none', transition: 'border-color 0.2s',
+});
+
+const iconBtnStyle = (bg, color) => ({
+    background: bg, border: 'none', color,
+    width: '30px', height: '30px', borderRadius: '8px',
+    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    transition: 'opacity 0.2s'
+});
 
 export default AddQuestion;

@@ -135,6 +135,7 @@
     font-weight: 700;
     color: #0f172a;
     font-size: 0.95rem;
+    display: block;
 }
 
 .user-role {
@@ -143,6 +144,7 @@
     color: #4f46e5;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: block;
 }
 
 .dropdown-link {

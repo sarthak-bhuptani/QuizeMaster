@@ -84,12 +84,13 @@ const TeacherDashboard = () => {
     };
 
     const handleAIQuizGenerated = async (quizQuestions, formData) => {
+        const marksPerQ = formData.marksPerQuestion || 5;
         try {
             const courseRes = await api.post('/exam/courses', {
-                course_name: formData.topic + ' (AI Generated)',
+                course_name: formData.topic,
                 question_number: quizQuestions.length,
-                total_marks: quizQuestions.reduce((sum, q) => sum + (q.marks || 1), 0),
-                time_limit: Math.max(10, quizQuestions.length * 1.5)
+                total_marks: quizQuestions.length * marksPerQ,
+                time_limit: formData.timeLimit || Math.max(10, quizQuestions.length * 1.5)
             });
             const courseId = courseRes.data._id;
             for (const q of quizQuestions) {
@@ -101,10 +102,10 @@ const TeacherDashboard = () => {
                     option3: q.options[2],
                     option4: q.options[3],
                     answer: q.correct_answer,
-                    marks: q.marks || 1
+                    marks: marksPerQ
                 });
             }
-            alert(`Quiz "${formData.topic}" created successfully with ${quizQuestions.length} questions!`);
+            alert(`Quiz "${formData.topic}" created with ${quizQuestions.length} questions × ${marksPerQ} marks each!`);
             setShowAIModal(false);
             loadTeacherData();
             setActiveTab('quizzes');
@@ -217,16 +218,27 @@ const TeacherDashboard = () => {
 
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                         {activeTab === 'quizzes' && (
-                            <Link to="/teacher/create-quiz" style={{ textDecoration: 'none' }} className="hide-on-mobile">
-                                <motion.button 
-                                    whileHover={{ scale: 1.02 }} 
+                            <div className="hide-on-mobile" style={{ display: 'flex', gap: '0.75rem' }}>
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="btn btn-primary"
+                                    className="btn btn-secondary"
                                     style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                                    onClick={() => setShowAIModal(true)}
                                 >
-                                    <PlusCircle size={16} /> New Quiz
+                                    <Sparkles size={16} /> AI Quiz
                                 </motion.button>
-                            </Link>
+                                <Link to="/teacher/create-quiz" style={{ textDecoration: 'none' }}>
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="btn btn-primary"
+                                        style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                                    >
+                                        <PlusCircle size={16} /> New Quiz
+                                    </motion.button>
+                                </Link>
+                            </div>
                         )}
                         <div style={{ textAlign: 'right' }} className="hide-on-mobile">
                             <div style={{ fontWeight: 'bold', color: '#0f172a', fontSize: '0.9rem' }}>{user?.username}</div>
