@@ -15,7 +15,6 @@ const ForgotPassword = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = 'auto'; };
     }, []);
 
@@ -207,15 +206,17 @@ const ForgotPassword = () => {
 
             <style>{`
                 .auth-fullscreen-center {
-                    position: fixed; inset: 0;
+                    position: relative;
+                    min-height: 100vh;
                     display: flex; align-items: center; justify-content: center;
                     background-color: #f1f5f9; font-family: 'Outfit', sans-serif;
-                    z-index: 9999;
+                    padding: 120px 1rem 40px;
                 }
                 .auth-bg-soft {
                     position: absolute; inset: 0;
                     background-image: radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
                                       radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.05) 0px, transparent 50%);
+                    pointer-events: none;
                 }
                 .auth-card-v3 {
                     background: white; width: 100%; max-width: 400px;
@@ -252,13 +253,14 @@ const ForgotPassword = () => {
                 .auth-footer-v3 { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.9rem; }
                 .auth-footer-v3 a { text-decoration: none; font-weight: 700; color: #4f46e5; display: inline-flex; align-items: center; gap: 5px; }
                 
-                .auth-success-v3 { text-align: center; display: flex; flexDirection: column; gap: 1.5rem; align-items: center; }
+                .auth-success-v3 { text-align: center; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; }
                 .auth-success-ico { width: 64px; height: 64px; border-radius: 50%; background: #d1fae5; display: flex; align-items: center; justify-content: center; }
                 
                 @media (max-width: 480px) {
-                    .auth-fullscreen-center { padding: 1rem; position: relative; min-height: 100vh; display: block; overflow-y: auto; }
-                    .auth-card-v3 { padding: 2.5rem 1.5rem; border-radius: 16px; margin: 2rem auto; }
-                    .auth-header-v3 h2 { font-size: 1.25rem; }
+                    .auth-fullscreen-center { padding: 90px 0.75rem 40px; }
+                    .auth-card-v3 { padding: 2rem 1.25rem; border-radius: 20px; width: 100%; max-width: none; }
+                    .auth-header-v3 h2 { font-size: 1.3rem; }
+                    .auth-form-v3 { gap: 1.25rem; }
                 }
             `}</style>
         </div>

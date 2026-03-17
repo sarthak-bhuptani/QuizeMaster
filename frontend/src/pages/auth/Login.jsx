@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, GraduationCap, School, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ArrowRight, GraduationCap, School, ArrowLeft, Brain } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Login = ({ userType }) => {
@@ -13,7 +13,7 @@ const Login = ({ userType }) => {
     useEffect(() => {
         localStorage.removeItem('user');
         localStorage.removeItem('admin');
-        document.body.style.overflow = 'hidden';
+        // Removed overflow hidden to allow scrolling below navbar
         return () => { document.body.style.overflow = 'auto'; };
     }, []);
 
@@ -50,17 +50,17 @@ const Login = ({ userType }) => {
         <div className="auth-fullscreen-center">
             <div className="auth-bg-soft"></div>
             
+            {/* Duplicate Brand Link removed as Navbar is now visible */}
+
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="auth-card-v3"
             >
                 <div className="auth-header-v3">
-                    <Link to="/" className="auth-logo-link">
-                        <div className="auth-icon-v3" style={{ background: isStudent ? '#eef2ff' : '#f5f3ff' }}>
-                            {isStudent ? <GraduationCap size={32} color="#4f46e5" /> : <School size={32} color="#7c3aed" />}
-                        </div>
-                    </Link>
+                    <div className="auth-icon-v3" style={{ background: isStudent ? '#eef2ff' : '#f5f3ff' }}>
+                        {isStudent ? <GraduationCap size={32} color="#4f46e5" /> : <School size={32} color="#7c3aed" />}
+                    </div>
                     <h2>{isStudent ? "Student Login" : "Teacher Login"}</h2>
                     <p>Enter your credentials to continue</p>
                 </div>
@@ -128,10 +128,11 @@ const Login = ({ userType }) => {
 
             <style>{`
                 .auth-fullscreen-center {
-                    position: fixed; inset: 0;
+                    position: relative;
+                    min-height: 100vh;
                     display: flex; align-items: center; justify-content: center;
                     background-color: #f1f5f9; font-family: 'Outfit', sans-serif;
-                    z-index: 9999;
+                    padding: 120px 1rem 40px;
                 }
                 .auth-bg-soft {
                     position: absolute; inset: 0;
@@ -141,7 +142,7 @@ const Login = ({ userType }) => {
                 }
                 .auth-card-v3 {
                     background: white; width: 100%; max-width: 400px;
-                    padding: 2rem 2rem; border-radius: 24px;
+                    padding: 2.5rem 2rem; border-radius: 24px;
                     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
                     border: 1px solid #e2e8f0; position: relative; z-index: 10;
                 }
@@ -176,9 +177,10 @@ const Login = ({ userType }) => {
                 .auth-footer-v3 { text-align: center; margin-top: 1.5rem; color: #64748b; font-size: 0.9rem; }
                 .auth-footer-v3 a { text-decoration: none; font-weight: 700; }
                 @media (max-width: 480px) {
-                    .auth-fullscreen-center { padding: 1rem; position: relative; min-height: 100vh; display: block; overflow-y: auto; }
-                    .auth-card-v3 { padding: 2rem 1.5rem; border-radius: 16px; margin: 2rem auto; }
-                    .auth-header-v3 h2 { font-size: 1.25rem; }
+                    .auth-fullscreen-center { padding: 90px 0.75rem 40px; }
+                    .auth-card-v3 { padding: 2rem 1.25rem; border-radius: 20px; width: 100%; max-width: none; }
+                    .auth-header-v3 h2 { font-size: 1.3rem; }
+                    .auth-form-v3 { gap: 1.25rem; }
                 }
             `}</style>
         </div>

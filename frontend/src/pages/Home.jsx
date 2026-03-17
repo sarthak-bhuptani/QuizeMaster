@@ -22,101 +22,122 @@ const Home = () => {
 
     return (
         <div className="home-wrapper">
-            {/* Header Spacer */}
-            <div style={{ height: '70px' }}></div>
+            <div className="home-unified-bg">
+                <div className="shape circle-1"></div>
+                <div className="shape circle-2"></div>
+                <div className="shape circle-3"></div>
+            </div>
 
-            {/* Hero Section - Centered & Simple */}
-            <section className="ultra-hero">
+            {/* Premium Hero Section */}
+            <section className="hero-premium">
                 <div className="container">
-                    <motion.div 
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="hero-content-center"
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="hero-content"
                     >
-                        <div className="badge-new">✨ Simple. Powerful. Free.</div>
-                        <h1 className="main-heading">
-                            The smartest way to <br />
-                            <span>test and learn.</span>
+                        <span className="hero-badge">Explore the future of education</span>
+                        <h1 className="hero-title">
+                            Master your skills with <br />
+                            <span className="gradient-text">QuizMaster AI</span>
                         </h1>
-                        <p className="sub-heading">
-                            Create professional quizzes in minutes. Join thousands of teachers and students using QuizMaster to simplify their education journey.
+                        <p className="hero-subtitle">
+                            The all-in-one platform for rapid quiz creation, real-time assessment, and gamified learning experiences.
                         </p>
-                        
-                        <div className="hero-actions">
-                            <Link to="/student/signup" className="primary-btn-large">
-                                Get Started Free <ArrowRight size={20} />
+
+                        <div className="hero-cta-group">
+                            <Link to="/student/signup" className="btn-primary-v5">
+                                Join Now — It's Free <ArrowRight size={20} />
                             </Link>
-                            <Link to="/student/login" className="secondary-btn-large">
-                                View Demo
+                            <Link to="/student/login" className="btn-secondary-v5">
+                                Explore Featured Quizzes
                             </Link>
                         </div>
 
-                        <div className="hero-trust">
-                            <div className="stars">
-                                <Star size={16} fill="#f59e0b" color="#f59e0b" />
-                                <Star size={16} fill="#f59e0b" color="#f59e0b" />
-                                <Star size={16} fill="#f59e0b" color="#f59e0b" />
-                                <Star size={16} fill="#f59e0b" color="#f59e0b" />
-                                <Star size={16} fill="#f59e0b" color="#f59e0b" />
+                        <div className="hero-stats">
+                            <div className="stat-item">
+                                <strong>50k+</strong>
+                                <span>Active Users</span>
                             </div>
-                            <span>Trusted by 5,000+ educators worldwide</span>
+                            <div className="stat-divider"></div>
+                            <div className="stat-item">
+                                <strong>100k+</strong>
+                                <span>Quizzes Taken</span>
+                            </div>
+                            <div className="stat-divider"></div>
+                            <div className="stat-item">
+                                <strong>4.9/5</strong>
+                                <span>User Rating</span>
+                            </div>
                         </div>
                     </motion.div>
                 </div>
             </section>
 
-            {/* Feature Icons - Horizontal & Minimal */}
-            <section className="features-simple">
+            {/* How It Works Section */}
+            <section className="how-it-works">
                 <div className="container">
-                    <div className="feature-grid-simple">
-                        <div className="feature-item-simple">
-                            <div className="icon-box purple"><Layout size={24} /></div>
-                            <h3>Intuitive Builder</h3>
-                            <p>Create quizzes with 0 learning curve. It's as easy as typing a document.</p>
+                    <div className="section-header">
+                        <h2>How it Works</h2>
+                        <p>Get started with QuizMaster in three simple steps</p>
+                    </div>
+
+                    <div className="steps-grid">
+                        <div className="step-card">
+                            <div className="step-num">01</div>
+                            <div className="step-icon blue"><Layout size={24} /></div>
+                            <h3>Create / Choose</h3>
+                            <p>Teachers can build quizzes manually or using AI, while students pick from categories.</p>
                         </div>
-                        <div className="feature-item-simple">
-                            <div className="icon-box green"><Zap size={24} /></div>
-                            <h3>Real-time Results</h3>
-                            <p>Instantly see who's passing and who's struggling with rich analytics.</p>
+                        <div className="step-card">
+                            <div className="step-num">02</div>
+                            <div className="step-icon purple"><Zap size={24} /></div>
+                            <h3>Engage & Solve</h3>
+                            <p>Take interactive quizzes with real-time feedback and earn XP on every right answer.</p>
                         </div>
-                        <div className="feature-item-simple">
-                            <div className="icon-box blue"><Users size={24} /></div>
-                            <h3>Class Management</h3>
-                            <p>Organize students, track attendance, and manage multiple cohorts easily.</p>
-                        </div>
-                        <div className="feature-item-simple">
-                            <div className="icon-box yellow"><Trophy size={24} /></div>
-                            <h3>Gamified Experience</h3>
-                            <p>Badges, leaderboards, and rewards to keep students engaged and motivated.</p>
+                        <div className="step-card">
+                            <div className="step-num">03</div>
+                            <div className="step-icon green"><Trophy size={24} /></div>
+                            <h3>Track Progress</h3>
+                            <p>Analyze results with deep insights, unlock badges, and climb the global leaderboard.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Role Cards - Clear Path for Users */}
-            <section className="role-sections">
+            {/* Dynamic Access Section */}
+            <section className="portal-access">
                 <div className="container">
-                    <div className="role-grid">
-                        <motion.div whileHover={{ y: -10 }} className="role-card student-v">
-                            <h2>For Students</h2>
-                            <p>Take exams from anywhere, track your scores, and reach the top of the leaderboard.</p>
-                            <ul>
-                                <li><CheckCircle2 size={18} /> Interactive Quiz Interface</li>
-                                <li><CheckCircle2 size={18} /> Personal Performance Dashboard</li>
-                                <li><CheckCircle2 size={18} /> Instant Result Feedback</li>
+                    <div className="portal-grid">
+                        <motion.div
+                            whileHover={{ y: -10 }}
+                            className="portal-card student-portal"
+                        >
+                            <div className="portal-label">FOR STUDENTS</div>
+                            <h3>Start Your Learning Journey</h3>
+                            <p>Test your knowledge, compete with peers, and track your academic growth with interactive tools.</p>
+                            <ul className="portal-features">
+                                <li><CheckCircle2 size={16} /> Instant Grading & Feedback</li>
+                                <li><CheckCircle2 size={16} /> Achievement Badges/XP</li>
+                                <li><CheckCircle2 size={16} /> Detailed Performance Reports</li>
                             </ul>
-                            <Link to="/student/login" className="role-btn">Student Login</Link>
+                            <Link to="/student/login" className="portal-btn">Access Student Panel</Link>
                         </motion.div>
 
-                        <motion.div whileHover={{ y: -10 }} className="role-card teacher-v">
-                            <h2>For Teachers</h2>
-                            <p>A complete toolkit to manage assessments, grade questions, and monitor progress.</p>
-                            <ul>
-                                <li><CheckCircle2 size={18} /> Automated Grading System</li>
-                                <li><CheckCircle2 size={18} /> Detailed Student Analytics</li>
-                                <li><CheckCircle2 size={18} /> Easy Exam Creation</li>
+                        <motion.div
+                            whileHover={{ y: -10 }}
+                            className="portal-card teacher-portal"
+                        >
+                            <div className="portal-label">FOR TEACHERS & ADMINS</div>
+                            <h3>Empower Your Classroom</h3>
+                            <p>Create impactful assessments, manage student groups, and gain powerful insights into class performance.</p>
+                            <ul className="portal-features">
+                                <li><CheckCircle2 size={16} /> AI-Powered Quiz Generator</li>
+                                <li><CheckCircle2 size={16} /> Manual Question Editor</li>
+                                <li><CheckCircle2 size={16} /> Class-wide Analytics</li>
                             </ul>
-                            <Link to="/teacher/login" className="role-btn">Teacher Login</Link>
+                            <Link to="/teacher/login" className="portal-btn">Access Professional Panel</Link>
                         </motion.div>
                     </div>
                 </div>
