@@ -6,12 +6,13 @@ import {
     ChevronRight, Target, Flame, LogOut, Menu, X, Sparkles, Brain
 } from 'lucide-react';
 import api from '../../services/api';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('overview');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
     const [courses, setCourses] = useState([]);
     const [myResults, setMyResults] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
@@ -20,6 +21,20 @@ const StudentDashboard = () => {
     const [user, setUser] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
 
+    // Sync state with URL params
+    useEffect(() => {
+        const tab = searchParams.get('tab') || 'overview';
+        if (tab !== activeTab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    const handleTabChange = (newTab) => {
+        setSearchParams({ tab: newTab });
+        setActiveTab(newTab);
+        setSidebarOpen(false);
+    };
+
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (!storedUser) {
@@ -27,6 +42,10 @@ const StudentDashboard = () => {
             return;
         }
         const currentUser = JSON.parse(storedUser);
+        if (!currentUser.studentId) {
+            navigate('/student/login');
+            return;
+        }
         setUser(currentUser);
         loadStudentData(currentUser.studentId);
     }, []);
@@ -43,7 +62,7 @@ const StudentDashboard = () => {
             const [courseRes, resultRes, leaderboardRes] = await Promise.all([
                 api.get('/exam/courses'),
                 api.get(`/exam/results/student/${studentId}`),
-                api.get('/exam/results')
+                api.get('/exam/results?ranking=true')
             ]);
             setCourses(courseRes.data);
             setMyResults(resultRes.data);
@@ -70,7 +89,7 @@ const StudentDashboard = () => {
 
     const NavButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
+            onClick={() => handleTabChange(id)}
             className={`nav-btn ${activeTab === id ? 'active' : ''}`}
         >
             <Icon size={20} />
@@ -101,22 +120,12 @@ const StudentDashboard = () => {
 
             {/* Sidebar */}
             <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
-                <div style={{ padding: '2rem 1.5rem 1rem', display: 'flex', alignItems: 'center', justifyItems: 'space-between', width: '100%' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '35px', height: '35px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Brain size={20} color="white" />
-                        </div>
-                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '-0.5px', color: '#fff' }}>QuizeMaster</span>
-                    </div>
+                <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Student Portal</span>
                     <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                         <X size={24} />
                     </button>
-                </div>
-
-                <div style={{ padding: '0 1.5rem 1.5rem' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
-                        Student Portal
-                    </div>
                 </div>
 
                 <div style={{ padding: '0 1.5rem 2.5rem' }} className="nav-items-container">
@@ -126,7 +135,7 @@ const StudentDashboard = () => {
                     <NavButton id="leaderboard" label="Hall of Fame" icon={Trophy} />
                 </div>
 
-                <div style={{ padding: '0 1.5rem', marginTop: '1rem' }} className="hide-on-mobile">
+                <div className="hide-on-mobile" style={{ padding: '0 1.5rem', marginTop: '1rem' }}>
                     <div className="glass-card" style={{ padding: '1rem', background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(99, 102, 241, 0.1))', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.75rem', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Current Streak</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -136,7 +145,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 'auto', padding: '1.5rem', width: '100%' }}>
+                <div className="hide-on-mobile" style={{ marginTop: 'auto', padding: '1.5rem', width: '100%' }}>
                     <button
                         onClick={handleLogout}
                         className="btn-danger-soft"
@@ -154,38 +163,29 @@ const StudentDashboard = () => {
             {/* Main Content */}
             <div className="dashboard-content">
                 <button
-                    className="mobile-menu-btn hide-on-desktop"
+                    className="mobile-menu-btn hide-on-desktop hide-on-mobile"
                     onClick={() => setSidebarOpen(true)}
                     style={{ display: 'none' }} // Controlled by CSS media queries
                 >
                     <Menu size={24} />
                 </button>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-                    <div>
-                        <h1 className="section-title">
+                <div className="dashboard-header-flex">
+                    <div style={{ flex: 1 }}>
+                        <h1 className="section-title" style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', marginBottom: '0.2rem' }}>
                             Hello, {user?.name?.split(' ')[0] || 'Explorer'}! 👋
                         </h1>
-                        <p className="text-secondary">Ready to conquer your assessments today?</p>
+                        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        </p>
                     </div>
-                    <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                        {/* Gamification Stats */}
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                         <div style={{ textAlign: 'right' }} className="hide-on-mobile">
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>LEVEL {user?.level || 1}</div>
-                            <div style={{ width: '150px', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-                                <div style={{ width: `${(user?.xp % 100) || 0}%`, height: '100%', background: 'var(--primary)' }}></div>
-                            </div>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--primary)', marginTop: '0.2rem', fontWeight: 'bold' }}>{user?.xp || 0} XP</div>
+                            <div style={{ fontWeight: 'bold', color: '#0f172a', fontSize: '0.9rem' }}>{user?.name || user?.username}</div>
+                            <div style={{ fontSize: '0.7rem', color: '#6366f1', fontWeight: '800', textTransform: 'uppercase' }}>Student Profile</div>
                         </div>
-
-                        <div style={{ textAlign: 'right', marginRight: '1rem' }} className="hide-on-mobile">
-                            <div style={{ fontSize: '0.8rem' }} className="text-secondary">Badges Unlocked</div>
-                            <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }} className="text-warning">
-                                <Trophy size={16} /> {user?.badges?.length || 0}
-                            </div>
-                        </div>
-                        <div style={{ width: '50px', height: '50px', borderRadius: '15px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold', border: '2px solid rgba(255,255,255,0.1)' }}>
-                            {user?.name?.[0] || 'S'}
+                        <div className="user-avatar-circle">
+                            {(user?.name?.[0] || user?.username?.[0] || 'S').toUpperCase()}
                         </div>
                     </div>
                 </div>
@@ -237,7 +237,7 @@ const StudentDashboard = () => {
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                                <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                                     <div className="glass-card">
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                                             <h3 style={{ margin: 0 }}>Recommended for You</h3>
@@ -292,9 +292,9 @@ const StudentDashboard = () => {
                                         style={{ paddingLeft: '3.5rem' }}
                                     />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                                     {courses.filter(c => c.course_name.toLowerCase().includes(searchTerm.toLowerCase())).map(course => (
-                                        <div key={course._id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '2.5rem' }}>
+                                        <div key={course._id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
                                             <div style={{ width: '60px', height: '60px', borderRadius: '15px', background: 'var(--primary-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontWeight: 800, fontSize: '1.5rem' }}>
                                                 {course.course_name[0]}
                                             </div>

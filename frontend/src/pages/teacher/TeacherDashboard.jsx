@@ -5,13 +5,14 @@ import {
     CheckCircle, UserPlus, Search, GraduationCap, Trophy, ChevronRight, LogOut, Sparkles, Activity, Menu, X, Brain
 } from 'lucide-react';
 import api from '../../services/api';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import AIQuizGenerator from './AIQuizGenerator';
 
 const TeacherDashboard = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('overview');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
     const [courses, setCourses] = useState([]);
     const [students, setStudents] = useState([]);
     const [results, setResults] = useState([]);
@@ -19,10 +20,33 @@ const TeacherDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showAIModal, setShowAIModal] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const user = localStorage.getItem('user');
-        if (!user) navigate('/teacher/login');
+        const tab = searchParams.get('tab') || 'overview';
+        if (tab !== activeTab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    const handleTabChange = (newTab) => {
+        setSearchParams({ tab: newTab });
+        setActiveTab(newTab);
+        setSidebarOpen(false);
+    };
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+            navigate('/teacher/login');
+            return;
+        }
+        const currentUser = JSON.parse(storedUser);
+        if (!currentUser.teacherId) {
+            navigate('/teacher/login');
+            return;
+        }
+        setUser(currentUser);
         loadTeacherData();
     }, []);
 
@@ -92,6 +116,18 @@ const TeacherDashboard = () => {
         }
     };
 
+    const handleDeleteResult = async (id) => {
+        if (!id) {
+            alert("Error: Result ID is missing.");
+            return;
+        }
+        if (!window.confirm("Delete this student's result record?")) return;
+        try {
+            await api.delete(`/exam/results/${id}`);
+            loadTeacherData();
+        } catch (err) { alert("Failed to delete result"); }
+    };
+
     const avgScore = results.length > 0
         ? (results.reduce((sum, r) => sum + (r.marks / r.total_marks * 100), 0) / results.length).toFixed(1)
         : 0;
@@ -105,7 +141,7 @@ const TeacherDashboard = () => {
 
     const NavButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
+            onClick={() => handleTabChange(id)}
             className={`nav-btn ${activeTab === id ? 'active' : ''}`}
         >
             <Icon size={20} />
@@ -133,24 +169,13 @@ const TeacherDashboard = () => {
             {/* Mobile Overlay */}
             <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
 
-            {/* Sidebar */}
             <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
-                <div style={{ padding: '2rem 1.5rem 1rem', display: 'flex', alignItems: 'center', justifyItems: 'space-between', width: '100%' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '35px', height: '35px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Brain size={20} color="white" />
-                        </div>
-                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '-0.5px', color: '#fff' }}>QuizeMaster</span>
-                    </div>
+                <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Teacher Portal</span>
                     <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                         <X size={24} />
                     </button>
-                </div>
-
-                <div style={{ padding: '0 1.5rem 1.5rem' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
-                        Teacher Portal
-                    </div>
                 </div>
 
                 <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -178,37 +203,44 @@ const TeacherDashboard = () => {
             {/* Main Content */}
             <div className="dashboard-content">
                 <button
-                    className="mobile-menu-btn hide-on-desktop"
+                    className="mobile-menu-btn hide-on-desktop hide-on-mobile"
                     onClick={() => setSidebarOpen(true)}
                     style={{ display: 'none' }} // Controlled by CSS media queries
                 >
                     <Menu size={24} />
                 </button>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem' }}>
-                    <div>
-                        <h1 className="section-title">
-                            {activeTab === 'overview' ? 'Welcome Back!' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                <div className="dashboard-header-flex">
+                    <div style={{ flex: 1 }}>
+                        <h1 className="section-title" style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', marginBottom: '0.2rem' }}>
+                            {activeTab === 'overview' ? `Hello, Teacher! 👋` : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
                         </h1>
-                        <p className="text-secondary">Here's what's happening with your courses.</p>
+                        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        </p>
                     </div>
-                    {activeTab === 'quizzes' && (
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                className="btn"
-                                style={{ background: 'linear-gradient(135deg, var(--accent), #db2777)', color: 'white' }}
-                                onClick={() => setShowAIModal(true)}
-                            >
-                                <Sparkles size={18} /> AI Generate
-                            </motion.button>
-                            <Link to="/teacher/create-quiz">
-                                <motion.button whileHover={{ scale: 1.05 }} className="btn btn-primary">
-                                    <PlusCircle size={20} /> Create New Quiz
+
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        {activeTab === 'quizzes' && (
+                            <Link to="/teacher/create-quiz" style={{ textDecoration: 'none' }} className="hide-on-mobile">
+                                <motion.button 
+                                    whileHover={{ scale: 1.02 }} 
+                                    whileTap={{ scale: 0.98 }}
+                                    className="btn btn-primary"
+                                    style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                                >
+                                    <PlusCircle size={16} /> New Quiz
                                 </motion.button>
                             </Link>
+                        )}
+                        <div style={{ textAlign: 'right' }} className="hide-on-mobile">
+                            <div style={{ fontWeight: 'bold', color: '#0f172a', fontSize: '0.9rem' }}>{user?.username}</div>
+                            <div style={{ fontSize: '0.7rem', color: '#4f46e5', fontWeight: '800', textTransform: 'uppercase' }}>Teacher Portal</div>
                         </div>
-                    )}
+                        <div className="user-avatar-circle">
+                            {(user?.username?.[0] || 'T').toUpperCase()}
+                        </div>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -368,11 +400,16 @@ const TeacherDashboard = () => {
                                                 <th>Quiz</th>
                                                 <th>Score</th>
                                                 <th>Percentage</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {results.map((result, i) => (
-                                                <tr key={i}>
+                                            {results.filter(r => {
+                                                const sName = `${r.student_id?.user?.first_name} ${r.student_id?.user?.last_name}`.toLowerCase();
+                                                const qName = (r.exam_id?.course_name || '').toLowerCase();
+                                                return sName.includes(searchTerm.toLowerCase()) || qName.includes(searchTerm.toLowerCase());
+                                            }).map((result, i) => (
+                                                <tr key={result._id || i}>
                                                     <td>{result.student_id?.user?.first_name || 'Student'} {result.student_id?.user?.last_name || ''}</td>
                                                     <td>{result.exam_id?.course_name || 'Quiz'}</td>
                                                     <td style={{ fontWeight: 'bold' }}>{result.marks} / {result.total_marks}</td>
@@ -383,6 +420,11 @@ const TeacherDashboard = () => {
                                                         }}>
                                                             {(result.marks / result.total_marks * 100).toFixed(0)}%
                                                         </span>
+                                                    </td>
+                                                    <td>
+                                                        <button onClick={() => handleDeleteResult(result._id || result.id)} className="btn btn-outline" style={{ color: 'var(--danger)', padding: '0.5rem' }}>
+                                                            <Trash2 size={16} />
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}

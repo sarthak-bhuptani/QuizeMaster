@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, Users, BookOpen, UserCheck, Trash2, CheckSquare,
-    LayoutDashboard, GraduationCap, Brain, Menu, X, Search, LogOut
+    LayoutDashboard, GraduationCap, Brain, Menu, X, Search, LogOut, Edit
 } from 'lucide-react';
 import api from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
     RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend
@@ -13,12 +13,28 @@ import {
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('overview');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
     const [stats, setStats] = useState({ totalStudents: 0, totalTeachers: 0, totalCourses: 0, pendingTeachers: 0 });
     const [data, setData] = useState({ teachers: [], students: [], courses: [] });
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
+    const [editingEntity, setEditingEntity] = useState(null); // { type: 'student'|'teacher', data: {} }
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    useEffect(() => {
+        const tab = searchParams.get('tab') || 'overview';
+        if (tab !== activeTab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    const handleTabChange = (newTab) => {
+        setSearchParams({ tab: newTab });
+        setActiveTab(newTab);
+        setSidebarOpen(false);
+    };
 
     useEffect(() => {
         const admin = localStorage.getItem('admin');
@@ -84,6 +100,40 @@ const AdminDashboard = () => {
         } catch (err) { alert('Delete failed'); }
     };
 
+    const handleEditEntity = (item, type) => {
+        setEditingEntity({
+            type,
+            id: item._id,
+            formData: {
+                first_name: item.user?.first_name || item.name || '',
+                last_name: item.user?.last_name || '',
+                username: item.user?.username || item.username || '',
+                email: item.user?.email || '',
+                mobile: item.mobile || '',
+                address: item.address || '',
+                password: '' // Keep empty to not change unless typed
+            }
+        });
+        setShowEditModal(true);
+    };
+
+    const handleUpdateEntity = async (e) => {
+        e.preventDefault();
+        try {
+            const { type, id, formData } = editingEntity;
+            const dataToUpdate = { ...formData };
+            if (!dataToUpdate.password) delete dataToUpdate.password;
+
+            await api.put(`/admin/update-${type}/${id}`, dataToUpdate);
+            alert(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully`);
+            setShowEditModal(false);
+            setEditingEntity(null);
+            loadAllData();
+        } catch (err) {
+            alert(err.response?.data?.message || 'Update failed');
+        }
+    };
+
     const filterData = (list) => {
         if (!searchTerm) return list;
         return list.filter(item =>
@@ -94,7 +144,7 @@ const AdminDashboard = () => {
 
     const TabButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
+            onClick={() => handleTabChange(id)}
             className={`nav-btn ${activeTab === id ? 'active' : ''}`}
         >
             <Icon size={20} />
@@ -118,7 +168,7 @@ const AdminDashboard = () => {
 
     const [showCreateTeacherModal, setShowCreateTeacherModal] = useState(false);
     const [newTeacher, setNewTeacher] = useState({
-        first_name: '', last_name: '', username: '', password: '', mobile: '', address: ''
+        first_name: '', last_name: '', email: '', username: '', password: '', mobile: '', address: ''
     });
 
     const handleCreateTeacher = async (e) => {
@@ -127,7 +177,7 @@ const AdminDashboard = () => {
             await api.post('/teacher/signup', { ...newTeacher, status: true });
             alert('Teacher Created Successfully');
             setShowCreateTeacherModal(false);
-            setNewTeacher({ first_name: '', last_name: '', username: '', password: '', mobile: '', address: '' });
+            setNewTeacher({ first_name: '', last_name: '', email: '', username: '', password: '', mobile: '', address: '' });
             loadAllData();
         } catch (err) {
             alert(err.response?.data?.message || 'Creation failed');
@@ -141,22 +191,12 @@ const AdminDashboard = () => {
 
             {/* Sidebar */}
             <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
-                <div style={{ padding: '2rem 1.5rem 1rem', display: 'flex', alignItems: 'center', justifyItems: 'space-between', width: '100%' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '35px', height: '35px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Brain size={20} color="white" />
-                        </div>
-                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '-0.5px', color: '#fff' }}>QuizeMaster</span>
-                    </div>
+                <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Admin Portal</span>
                     <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                         <X size={24} />
                     </button>
-                </div>
-
-                <div style={{ padding: '0 1.5rem 1.5rem' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
-                        Admin Portal
-                    </div>
                 </div>
 
                 <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -166,7 +206,7 @@ const AdminDashboard = () => {
                     <TabButton id="courses" label="Quizzes" icon={BookOpen} />
                 </div>
 
-                <div style={{ padding: '0 1.5rem', marginTop: 'auto', width: '100%' }}>
+                <div className="hide-on-mobile" style={{ padding: '0 1.5rem', marginTop: 'auto', width: '100%' }}>
                     <button
                         onClick={handleLogout}
                         className="btn-danger-soft"
@@ -184,29 +224,43 @@ const AdminDashboard = () => {
             {/* Main Content */}
             <div className="dashboard-content">
                 <button
-                    className="mobile-menu-btn hide-on-desktop"
+                    className="mobile-menu-btn hide-on-desktop hide-on-mobile"
                     onClick={() => setSidebarOpen(true)}
                     style={{ display: 'none' }} // Controlled by CSS media queries
                 >
                     <Menu size={24} />
                 </button>
 
-                {/* Header Actions */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-                    <div>
-                        <h1 className="section-title">
-                            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                <div className="dashboard-header-flex">
+                    <div style={{ flex: 1 }}>
+                        <h1 className="section-title" style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', marginBottom: '0.2rem' }}>
+                            {activeTab === 'overview' ? `Admin Panel ⚡` : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
                         </h1>
-                        <p className="text-secondary">Manage your system efficiently</p>
+                        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        </p>
                     </div>
-                    {activeTab === 'teachers' && (
-                        <button
-                            onClick={() => setShowCreateTeacherModal(true)}
-                            className="btn btn-primary"
-                        >
-                            <Users size={18} /> Add New Teacher
-                        </button>
-                    )}
+                    
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        {activeTab === 'teachers' && (
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setShowCreateTeacherModal(true)}
+                                className="btn btn-primary hide-on-mobile"
+                                style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                            >
+                                <Users size={16} /> Add Teacher
+                            </motion.button>
+                        )}
+                        <div style={{ textAlign: 'right' }} className="hide-on-mobile">
+                            <div style={{ fontWeight: 'bold', color: '#0f172a', fontSize: '0.9rem' }}>Admin Control</div>
+                            <div style={{ fontSize: '0.7rem', color: '#e11d48', fontWeight: '800', textTransform: 'uppercase' }}>Main Control</div>
+                        </div>
+                        <div className="user-avatar-circle" style={{ background: 'linear-gradient(135deg, #e11d48, #fb7185)' }}>
+                            A
+                        </div>
+                    </div>
                 </div>
 
                 {activeTab !== 'overview' && (
@@ -333,9 +387,14 @@ const AdminDashboard = () => {
                                                     <td className="text-secondary">@{student.user?.username}</td>
                                                     <td>{student.mobile || 'N/A'}</td>
                                                     <td>
-                                                        <button onClick={() => deleteEntity('student', student._id)} className="btn btn-outline" style={{ color: 'var(--danger)', padding: '0.5rem' }}>
-                                                            <Trash2 size={18} />
-                                                        </button>
+                                                        <div style={{ display: 'flex', gap: '0.8rem' }}>
+                                                            <button onClick={() => handleEditEntity(student, 'student')} className="btn btn-outline" style={{ color: 'var(--primary)', padding: '0.5rem' }}>
+                                                                <Edit size={18} />
+                                                            </button>
+                                                            <button onClick={() => deleteEntity('student', student._id)} className="btn btn-outline" style={{ color: 'var(--danger)', padding: '0.5rem' }}>
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -376,6 +435,9 @@ const AdminDashboard = () => {
                                                                 <CheckSquare size={18} />
                                                             </button>
                                                         )}
+                                                        <button onClick={() => handleEditEntity(teacher, 'teacher')} className="bg-primary-soft" style={{ border: 'none', padding: '0.5rem', borderRadius: '8px', cursor: 'pointer' }} title="Edit">
+                                                            <Edit size={18} className="text-primary" />
+                                                        </button>
                                                         <button onClick={() => deleteEntity('teacher', teacher._id)} className="bg-danger-soft" style={{ border: 'none', padding: '0.5rem', borderRadius: '8px', cursor: 'pointer' }} title="Delete">
                                                             <Trash2 size={18} />
                                                         </button>
@@ -453,9 +515,13 @@ const AdminDashboard = () => {
                                         <input type="text" required value={newTeacher.username} onChange={e => setNewTeacher({ ...newTeacher, username: e.target.value })} />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Password</label>
-                                        <input type="password" required value={newTeacher.password} onChange={e => setNewTeacher({ ...newTeacher, password: e.target.value })} />
+                                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Email Address</label>
+                                        <input type="email" required value={newTeacher.email} onChange={e => setNewTeacher({ ...newTeacher, email: e.target.value })} />
                                     </div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Password</label>
+                                    <input type="password" required value={newTeacher.password} onChange={e => setNewTeacher({ ...newTeacher, password: e.target.value })} />
                                 </div>
                                 <div>
                                     <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Mobile Number</label>
@@ -466,6 +532,56 @@ const AdminDashboard = () => {
                                     <input type="text" value={newTeacher.address} onChange={e => setNewTeacher({ ...newTeacher, address: e.target.value })} />
                                 </div>
                                 <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Create Teacher Account</button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+            {/* Edit Entity Modal */}
+            <AnimatePresence>
+                {showEditModal && editingEntity && (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                            className="glass-card"
+                            style={{ width: '90%', maxWidth: '500px', border: '1px solid var(--glass-border)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                                <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>Edit {editingEntity.type.charAt(0).toUpperCase() + editingEntity.type.slice(1)}</h2>
+                                <button onClick={() => setShowEditModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
+                            </div>
+                            <form onSubmit={handleUpdateEntity} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>First Name</label>
+                                        <input type="text" required value={editingEntity.formData.first_name} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, first_name: e.target.value } })} />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Last Name</label>
+                                        <input type="text" required value={editingEntity.formData.last_name} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, last_name: e.target.value } })} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Username</label>
+                                        <input type="text" required value={editingEntity.formData.username} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, username: e.target.value } })} />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Email Address</label>
+                                        <input type="email" required value={editingEntity.formData.email} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, email: e.target.value } })} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Password (Leave empty to keep current)</label>
+                                    <input type="password" value={editingEntity.formData.password} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, password: e.target.value } })} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Mobile Number</label>
+                                    <input type="text" required value={editingEntity.formData.mobile} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, mobile: e.target.value } })} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Address</label>
+                                    <input type="text" value={editingEntity.formData.address} onChange={e => setEditingEntity({ ...editingEntity, formData: { ...editingEntity.formData, address: e.target.value } })} />
+                                </div>
+                                <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Update Account</button>
                             </form>
                         </motion.div>
                     </div>

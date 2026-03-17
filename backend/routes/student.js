@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Student = require('../models/Student');
+const Teacher = require('../models/Teacher');
+
 
 // Get All Students
 router.get('/', async (req, res) => {
@@ -15,48 +17,92 @@ router.get('/', async (req, res) => {
 // Signup
 router.post('/signup', async (req, res) => {
     try {
-        const { first_name, last_name, username, password, mobile, address, profile_pic } = req.body;
+        console.log('Incoming Student Signup Request:', req.body);
+        const { first_name, last_name, email, username, password, mobile, address, profile_pic } = req.body;
 
-        // Simple validation
-        if (!first_name || !last_name || !username || !password || !mobile) {
-            return res.status(400).json({ message: 'All required fields must be provided' });
+        // Validation
+        if (!first_name || !last_name || !email || !username || !password || !mobile) {
+            return res.status(400).json({ message: 'Required fields are missing' });
         }
 
-        const existingStudent = await Student.findOne({ 'user.username': username });
-        if (existingStudent) {
-            return res.status(400).json({ message: 'Username already exists' });
+        // Check for duplicates
+        const normalizedEmail = email.toLowerCase();
+        const existingStudent = await Student.findOne({ 
+            $or: [{ 'user.username': username }, { 'user.email': normalizedEmail }] 
+        });
+        const existingTeacher = await Teacher.findOne({ 
+            $or: [{ 'user.username': username }, { 'user.email': normalizedEmail }] 
+        });
+        
+        if (existingStudent || existingTeacher) {
+            const conflict = (existingStudent || existingTeacher).user;
+            if (conflict.email.toLowerCase() === normalizedEmail) {
+                return res.status(400).json({ message: 'Email address is already in use. Please use a different email or try logging in.' });
+            }
+            return res.status(400).json({ message: 'This username is already taken. Please choose a different one.' });
         }
 
         const newStudent = new Student({
-            user: { first_name, last_name, username, password },
+            user: { 
+                first_name, 
+                last_name, 
+                email: normalizedEmail, 
+                username, 
+                password 
+            },
             mobile,
-            address,
-            profile_pic
+            address: address || '',
+            profile_pic: profile_pic || ''
         });
 
-        await newStudent.save();
-        res.status(201).json({ message: 'Student registered successfully', studentId: newStudent._id });
+        const savedStudent = await newStudent.save();
+        console.log('Student created successfully:', savedStudent._id);
+        res.status(201).json({ message: 'Student registered successfully', studentId: savedStudent._id });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('SIGNUP_ERROR:', error);
+        res.status(500).json({ 
+            message: 'Server error during registration', 
+            error: error.message 
+        });
     }
 });
 
 // Login
 router.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
+        console.log(`Login attempt for: [${email}]`);
 
-        // In a real app, use bcrypt to compare hashed passwords
-        const student = await Student.findOne({ 'user.username': username, 'user.password': password });
-
-        if (!student) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email/Username and password are required' });
         }
 
-        // In a real app, generate a JWT token here
+        const cleanIdentifier = email.trim();
+        
+        // 1. Find user first to see if they exist
+        const student = await Student.findOne({
+            $or: [
+                { 'user.email': { $regex: new RegExp(`^${cleanIdentifier}$`, 'i') } },
+                { 'user.username': cleanIdentifier } 
+            ]
+        });
+
+        if (!student) {
+            console.log(`Login failed: User [${cleanIdentifier}] not found in database.`);
+            return res.status(401).json({ message: 'Account not found. Please check your email/username.' });
+        }
+
+        // 2. Check password
+        if (student.user.password !== password) {
+            console.log(`Login failed: Incorrect password for user [${cleanIdentifier}]`);
+            return res.status(401).json({ message: 'Incorrect password. Please try again.' });
+        }
+
+        console.log(`Login success: [${student.user.email}]`);
         res.json({ message: 'Login successful', studentId: student._id, name: student.user.first_name });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('LOGIN_ERROR:', error);
+        res.status(500).json({ message: 'Server error during login', error: error.message });
     }
 });
 
@@ -82,7 +128,25 @@ router.put('/:id', async (req, res) => {
 
         if (first_name) student.user.first_name = first_name;
         if (last_name) student.user.last_name = last_name;
-        if (username) student.user.username = username;
+        if (username) {
+            const existingStudent = await Student.findOne({ 'user.username': username, _id: { $ne: id } });
+            const existingTeacher = await Teacher.findOne({ 'user.username': username });
+            if (existingStudent || existingTeacher) {
+                return res.status(400).json({ message: 'Username already exists' });
+            }
+            student.user.username = username;
+        }
+
+        if (req.body.email) {
+            const email = req.body.email;
+            const existingStudent = await Student.findOne({ 'user.email': email, _id: { $ne: id } });
+            const existingTeacher = await Teacher.findOne({ 'user.email': email });
+            if (existingStudent || existingTeacher) {
+                return res.status(400).json({ message: 'Email already exists' });
+            }
+            student.user.email = email;
+        }
+
         if (password) student.user.password = password;
         if (mobile) student.mobile = mobile;
         if (address) student.address = address;

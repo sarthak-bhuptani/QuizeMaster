@@ -133,13 +133,15 @@ const AddQuestion = () => {
                 .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
                 
                 @media (max-width: 900px) {
-                    .grid-layout { grid-template-columns: 1fr; }
-                    .form-section { order: 1; }
-                    .list-section { order: 2; }
+                    .manage-container { padding: 4rem 1rem 1rem; }
+                    .grid-layout { grid-template-columns: 1fr; gap: 1rem; }
+                    .form-section { order: 1; position: static !important; }
+                    .list-section { order: 2; margin-top: 1rem; }
+                    .options-grid { grid-template-columns: 1fr !important; }
                 }
             `}</style>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <div className="flex-mobile-column" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
                 <motion.button
                     whileHover={{ x: -5 }}
                     onClick={() => navigate('/teacher-dashboard')}
@@ -147,7 +149,7 @@ const AddQuestion = () => {
                 >
                     <ArrowLeft size={20} /> Back to Dashboard
                 </motion.button>
-                <h2 style={{ margin: 0 }}>Manage Questions</h2>
+                <h2 style={{ margin: 0, fontSize: window.innerWidth < 600 ? '1.5rem' : '2rem' }}>Manage Questions</h2>
             </div>
 
             <div className="grid-layout">
@@ -184,7 +186,7 @@ const AddQuestion = () => {
                             />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                        <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
                             {['option1', 'option2', 'option3', 'option4'].map((opt, i) => (
                                 <div key={opt}>
                                     <input
@@ -200,7 +202,7 @@ const AddQuestion = () => {
                             ))}
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Correct Answer</label>
                                 <select name="answer" value={formData.answer} onChange={handleChange} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>

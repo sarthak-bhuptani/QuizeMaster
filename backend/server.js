@@ -52,12 +52,24 @@ const studentRoutes = require('./routes/student');
 const teacherRoutes = require('./routes/teacher');
 const examRoutes = require('./routes/exam');
 const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
 
 app.use('/api/student', studentRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/exam', examRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/ai', require('./routes/aiRoutes'));
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('SERVER_ERROR:', err);
+    res.status(500).json({ 
+        message: 'Something went wrong on the server', 
+        error: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
 
 app.get('/', (req, res) => {
     res.send('Online Quiz API is running');

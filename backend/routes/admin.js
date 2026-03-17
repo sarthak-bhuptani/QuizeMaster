@@ -8,24 +8,44 @@ const Course = require('../models/Course');
 // Admin Login
 router.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        // Simple check (in production use hashed passwords!)
-        const admin = await Admin.findOne({ username, password });
+        const { email, password } = req.body;
+        console.log(`Admin Login attempt: [${email}]`);
+        
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email/Username and password are required' });
+        }
+
+        const cleanIdentifier = email.trim();
+        const admin = await Admin.findOne({ 
+            $or: [
+                { email: { $regex: new RegExp(`^${cleanIdentifier}$`, 'i') } },
+                { username: cleanIdentifier }
+            ]
+        });
 
         if (!admin) {
-            return res.status(401).json({ message: 'Invalid Admin Credentials' });
+            console.log(`Admin Login failed: user [${cleanIdentifier}] not found`);
+            return res.status(401).json({ message: 'Admin account not found.' });
         }
+
+        if (admin.password !== password) {
+            console.log(`Admin Login failed: Incorrect password for [${cleanIdentifier}]`);
+            return res.status(401).json({ message: 'Incorrect Admin password.' });
+        }
+
+        console.log(`Admin Login success: [${admin.email}]`);
         res.json({ message: 'Login successful', adminId: admin._id, name: admin.name });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('ADMIN_LOGIN_ERROR:', error);
+        res.status(500).json({ message: 'Server error during login', error: error.message });
     }
 });
 
-// Create Admin (One-time setup usually, but exposed here for ease)
+// Create Admin
 router.post('/create', async (req, res) => {
     try {
-        const { username, password, name } = req.body;
-        const newAdmin = new Admin({ username, password, name });
+        const { username, email, password, name } = req.body;
+        const newAdmin = new Admin({ username, email, password, name });
         await newAdmin.save();
         res.status(201).json({ message: 'Admin created' });
     } catch (error) {
@@ -136,6 +156,54 @@ router.delete('/delete-course/:id', async (req, res) => {
         res.json({ message: 'Course deleted' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting course' });
+    }
+});
+
+// Update Teacher
+router.put('/update-teacher/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { first_name, last_name, username, email, mobile, address, password } = req.body;
+        
+        const teacher = await Teacher.findById(id);
+        if (!teacher) return res.status(404).json({ message: 'Teacher not found' });
+
+        if (first_name) teacher.user.first_name = first_name;
+        if (last_name) teacher.user.last_name = last_name;
+        if (username) teacher.user.username = username;
+        if (email) teacher.user.email = email;
+        if (password) teacher.user.password = password;
+        if (mobile) teacher.mobile = mobile;
+        if (address) teacher.address = address;
+
+        await teacher.save();
+        res.json({ message: 'Teacher updated successfully', teacher });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating teacher', error: error.message });
+    }
+});
+
+// Update Student
+router.put('/update-student/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { first_name, last_name, username, email, mobile, address, password } = req.body;
+        
+        const student = await Student.findById(id);
+        if (!student) return res.status(404).json({ message: 'Student not found' });
+
+        if (first_name) student.user.first_name = first_name;
+        if (last_name) student.user.last_name = last_name;
+        if (username) student.user.username = username;
+        if (email) student.user.email = email;
+        if (password) student.user.password = password;
+        if (mobile) student.mobile = mobile;
+        if (address) student.address = address;
+
+        await student.save();
+        res.json({ message: 'Student updated successfully', student });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating student', error: error.message });
     }
 });
 

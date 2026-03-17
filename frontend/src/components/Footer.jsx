@@ -1,59 +1,126 @@
-import { Brain } from 'lucide-react';
+import { Brain, Twitter, Github, Linkedin } from 'lucide-react';
 
 const Footer = () => {
     return (
-        <footer className="footer-container">
-            <div className="footer-content">
-                <div className="footer-grid">
-                    {/* Column 1: Brand & Slogan */}
-                    <div className="footer-column-brand">
-                        <div className="footer-logo">
-                            <div className="footer-logo-icon">
-                                <Brain size={24} color="#ffffff" />
+        <footer style={footerStyle}>
+            <div style={containerStyle}>
+                <div style={gridStyle}>
+                    {/* Brand */}
+                    <div style={{ paddingRight: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <div style={iconWrapperStyle}>
+                                <Brain size={20} color="#fff" />
                             </div>
-                            QuizeMaster
+                            <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a' }}>QuizMaster</span>
                         </div>
-                        <p className="footer-desc">
-                            Building the world's most advanced collective brain through interactive
-                            learning and competitive assessment.
+                        <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                            A simple, secure, and user-friendly platform for learning and assessments.
                         </p>
                     </div>
 
-                    {/* Column 2: Platform */}
-                    <div className="footer-column">
-                        <h4 className="footer-header">PLATFORM</h4>
-                        <ul className="footer-links">
-                            {['Browse Quizzes', 'Categories', 'Live Events', 'Leaderboards'].map(link => (
-                                <li key={link}><a href="#">{link}</a></li>
-                            ))}
+                    {/* Links */}
+                    <div>
+                        <h4 style={headingStyle}>Product</h4>
+                        <ul style={listStyle}>
+                            <li><a href="#" style={linkStyle}>Features</a></li>
+                            <li><a href="#" style={linkStyle}>Pricing</a></li>
+                            <li><a href="#" style={linkStyle}>Teacher Portal</a></li>
+                            <li><a href="#" style={linkStyle}>Student Access</a></li>
                         </ul>
                     </div>
 
-                    {/* Column 3: Resources */}
-                    <div className="footer-column">
-                        <h4 className="footer-header">RESOURCES</h4>
-                        <ul className="footer-links">
-                            {['Help Center', 'API Docs', 'Teacher Portal', 'Community'].map(link => (
-                                <li key={link}><a href="#">{link}</a></li>
-                            ))}
+                    <div>
+                        <h4 style={headingStyle}>Resources</h4>
+                        <ul style={listStyle}>
+                            <li><a href="#" style={linkStyle}>Help Center</a></li>
+                            <li><a href="#" style={linkStyle}>Documentation</a></li>
+                            <li><a href="#" style={linkStyle}>Community Guidelines</a></li>
                         </ul>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="footer-bottom">
-                    <div className="footer-copyright">
-                        © 2024 QuizeMaster Inc.
-                    </div>
-                    <div className="footer-socials">
-                        {['Twitter', 'GitHub', 'LinkedIn'].map(social => (
-                            <a key={social} href="#">{social}</a>
-                        ))}
+                <div style={bottomStyle}>
+                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>&copy; 2024 QuizMaster Inc. All rights reserved.</p>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <a href="#" style={socialLinkStyle}><Twitter size={18} /></a>
+                        <a href="#" style={socialLinkStyle}><Github size={18} /></a>
+                        <a href="#" style={socialLinkStyle}><Linkedin size={18} /></a>
                     </div>
                 </div>
             </div>
+            <style>{`
+                @media (max-width: 768px) {
+                    .footer-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+                    .footer-bottom { flex-direction: column !important; gap: 1rem !important; text-align: center; }
+                }
+            `}</style>
         </footer>
     );
+};
+
+const footerStyle = {
+    backgroundColor: '#ffffff',
+    borderTop: '1px solid #e2e8f0',
+    padding: '4rem 0 2rem 0',
+};
+
+const containerStyle = {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '0 1.5rem',
+};
+
+const gridStyle = {
+    display: 'grid',
+    gridTemplateColumns: '2fr 1fr 1fr',
+    gap: '4rem',
+    marginBottom: '4rem',
+    className: 'footer-grid'
+};
+
+const iconWrapperStyle = {
+    backgroundColor: '#4f46e5',
+    borderRadius: '8px',
+    padding: '6px',
+    display: 'flex',
+};
+
+const headingStyle = {
+    fontSize: '0.85rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    color: '#0f172a',
+    fontWeight: '700',
+    marginBottom: '1.25rem',
+};
+
+const listStyle = {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+};
+
+const linkStyle = {
+    color: '#64748b',
+    textDecoration: 'none',
+    fontSize: '0.95rem',
+};
+
+const bottomStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: '2rem',
+    borderTop: '1px solid #e2e8f0',
+    className: 'footer-bottom'
+};
+
+const socialLinkStyle = {
+    color: '#94a3b8',
+    transition: 'color 0.2s',
 };
 
 export default Footer;

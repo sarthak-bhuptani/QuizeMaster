@@ -144,6 +144,9 @@ router.post('/results', async (req, res) => {
 // Get Results for a specific student
 router.get('/results/student/:studentId', async (req, res) => {
     try {
+        if (!req.params.studentId || req.params.studentId === 'undefined') {
+            return res.status(400).json({ message: 'Invalid student ID' });
+        }
         const results = await Result.find({ student_id: req.params.studentId })
             .populate('exam_id', 'course_name')
             .sort({ date: -1 });
@@ -153,41 +156,60 @@ router.get('/results/student/:studentId', async (req, res) => {
     }
 });
 
-// Get Results (for Leaderboard/Dashboard - Unique Student Ranking)
+// Get Results (for Leaderboard/Dashboard/Management)
 router.get('/results', async (req, res) => {
     try {
-        // Aggregate to find the BEST score for EACH student
-        const ranking = await Result.aggregate([
-            { $sort: { marks: -1, date: -1 } },
-            {
-                $group: {
-                    _id: "$student_id",
-                    bestMarks: { $first: "$marks" },
-                    total_marks: { $first: "$total_marks" },
-                    exam_id: { $first: "$exam_id" },
-                    date: { $first: "$date" }
-                }
-            },
-            { $sort: { bestMarks: -1 } },
-            { $limit: 100 }
-        ]);
+        const { ranking } = req.query;
 
-        // Populate details manually
-        const populatedRanking = await Promise.all(ranking.map(async (item) => {
-            const student = await Student.findById(item._id).populate('user');
-            const exam = await Course.findById(item.exam_id);
-            return {
-                student_id: student,
-                exam_id: exam,
-                marks: item.bestMarks,
-                total_marks: item.total_marks,
-                date: item.date
-            };
+        if (ranking === 'true') {
+            // Aggregate to find the BEST score for EACH student (Leaderboard)
+            const rankingData = await Result.aggregate([
+                { $sort: { marks: -1, date: -1 } },
+                {
+                    $group: {
+                        _id: "$student_id",
+                        resultId: { $first: "$_id" },
+                        bestMarks: { $first: "$marks" },
+                        total_marks: { $first: "$total_marks" },
+                        exam_id: { $first: "$exam_id" },
+                        date: { $first: "$date" }
+                    }
+                },
+                { $sort: { bestMarks: -1 } },
+                { $limit: 100 }
+            ]);
+
+            const populatedRanking = await Promise.all(rankingData.map(async (item) => {
+                const student = await Student.findById(item._id).populate('user');
+                const exam = await Course.findById(item.exam_id);
+                return {
+                    _id: item.resultId,
+                    student_id: student,
+                    exam_id: exam,
+                    marks: item.bestMarks,
+                    total_marks: item.total_marks,
+                    date: item.date
+                };
+            }));
+            return res.json(populatedRanking);
+        }
+
+        // Default: Return ALL results for management (Teacher Dashboard)
+        const results = await Result.find()
+            .populate({ path: 'student_id', populate: { path: 'user' } })
+            .populate('exam_id')
+            .sort({ date: -1 })
+            .lean();
+        
+        // Ensure _id is sent correctly
+        const sanitizedResults = results.map(r => ({
+            ...r,
+            _id: r._id.toString()
         }));
 
-        res.json(populatedRanking);
+        res.json(sanitizedResults);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching ranking', error: error.message });
+        res.status(500).json({ message: 'Error fetching results', error: error.message });
     }
 });
 
@@ -207,7 +229,11 @@ router.get('/results/:id', async (req, res) => {
 // Delete Result
 router.delete('/results/:id', async (req, res) => {
     try {
-        await Result.findByIdAndDelete(req.params.id);
+        const { id } = req.params;
+        if (!id || id === 'undefined') {
+            return res.status(400).json({ message: 'Invalid result ID' });
+        }
+        await Result.findByIdAndDelete(id);
         res.json({ message: 'Result deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting result' });

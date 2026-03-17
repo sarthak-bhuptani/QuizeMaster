@@ -108,64 +108,94 @@ const TakeQuiz = () => {
 
     if (!fullscreen && !loading && score === null) {
         return (
-            <div style={{ padding: '4rem 2rem', minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', background: 'radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%)', overflowY: 'auto' }}>
+            <div style={{ 
+                padding: '2rem 1rem', 
+                minHeight: '100vh', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                background: '#f8fafc',
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999
+            }}>
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card"
-                    style={{ padding: '3.5rem', maxWidth: '650px', width: '100%', border: '1px solid rgba(99, 102, 241, 0.3)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', margin: '2rem 0' }}
+                    style={{ 
+                        padding: window.innerWidth < 768 ? '2rem' : '3.5rem', 
+                        maxWidth: '550px', 
+                        width: '100%', 
+                        background: 'white',
+                        borderRadius: '24px',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+                        border: '1px solid #e2e8f0',
+                        color: '#1e293b'
+                    }}
                 >
                     <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                        <div style={{ width: '80px', height: '80px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '24px', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-                            <Shield size={40} color="#818cf8" />
+                        <div style={{ 
+                            width: '70px', 
+                            height: '70px', 
+                            background: '#f1f5f9', 
+                            borderRadius: '50%', 
+                            margin: '0 auto 1.5rem', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center'
+                        }}>
+                            <Shield size={32} color="#6366f1" />
                         </div>
-                        <h2 style={{ fontSize: '2.4rem', fontWeight: 800, marginBottom: '0.8rem', letterSpacing: '-0.5px' }}>Proctoring System</h2>
-                        <div style={{ height: '4px', width: '60px', background: '#6366f1', margin: '0 auto 1.5rem', borderRadius: '2px' }}></div>
-                        <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>Initial system integrity check required before access.</p>
+                        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>Quiz Instructions</h2>
+                        <p style={{ color: '#64748b', fontSize: '1.05rem' }}>Please read carefully before starting.</p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
-                        {[
-                            { label: 'AI Tab Monitoring', status: 'Active', icon: Activity },
-                            { label: 'Keyboard Lockdown', status: 'Engaged', icon: Lock },
-                            { label: 'Clipboard Guard', status: 'Secured', icon: Zap },
-                            { label: 'Network Integrity', status: 'Linked', icon: Target }
-                        ].map((rule, i) => (
-                            <div key={i} style={{ padding: '1.2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <rule.icon size={20} color="#818cf8" />
-                                <div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{rule.label}</div>
-                                    <div style={{ fontSize: '0.75rem', color: '#10b981' }}>● {rule.status}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(239, 68, 68, 0.1)', marginBottom: '2.5rem' }}>
-                        <h4 style={{ margin: '0 0 1rem 0', color: '#f87171', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Violation Policy</h4>
-                        <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                            <li>Minimizing windows or switching tabs will trigger a strike.</li>
-                            <li>Print-screen, DevTools, and Copy/Paste are disabled.</li>
-                            <li>Three strikes will result in <strong>automatic exam submission</strong>.</li>
+                    <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '16px', marginBottom: '2.5rem', border: '1px solid #e2e8f0' }}>
+                        <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#475569', fontSize: '0.95rem', lineHeight: '1.8' }}>
+                            <li>The quiz will open in <strong>Fullscreen Mode</strong>.</li>
+                            <li>Do not minimize or switch tabs during the quiz.</li>
+                            <li>Each question has a specific time limit.</li>
+                            <li>The quiz will auto-submit once the time ends.</li>
                         </ul>
                     </div>
 
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                    <label style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.75rem', 
+                        cursor: 'pointer', 
+                        marginBottom: '2rem', 
+                        padding: '1rem', 
+                        background: agreed ? '#eff6ff' : '#ffffff', 
+                        borderRadius: '12px',
+                        border: agreed ? '1px solid #bfdbfe' : '1px solid #e2e8f0',
+                        transition: 'all 0.2s'
+                    }}>
                         <input
                             type="checkbox"
                             checked={agreed}
                             onChange={(e) => setAgreed(e.target.checked)}
-                            style={{ width: '20px', height: '20px', accentColor: '#6366f1' }}
+                            style={{ width: '20px', height: '20px', cursor: 'pointer' }}
                         />
-                        <span style={{ fontSize: '0.95rem', color: '#cbd5e1' }}>I acknowledge and agree to follow all proctoring guidelines.</span>
+                        <span style={{ fontSize: '0.95rem', color: agreed ? '#1e40af' : '#64748b', fontWeight: 500 }}>I am ready to follow the instructions.</span>
                     </label>
 
                     <button
                         onClick={enterFullscreen}
+                        disabled={!agreed}
                         className="btn btn-primary"
-                        style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', fontWeight: 700, borderRadius: '16px', opacity: agreed ? 1 : 0.5, cursor: agreed ? 'pointer' : 'not-allowed', transition: 'all 0.3s' }}
+                        style={{ 
+                            width: '100%', 
+                            padding: '1.1rem', 
+                            fontSize: '1.1rem', 
+                            fontWeight: 700, 
+                            borderRadius: '14px',
+                            opacity: agreed ? 1 : 0.5,
+                            cursor: agreed ? 'pointer' : 'not-allowed',
+                            boxShadow: agreed ? '0 10px 15px -3px rgba(99, 102, 241, 0.2)' : 'none'
+                        }}
                     >
-                        Initialize Security Mode & Start
+                        Start Quiz Now
                     </button>
                 </motion.div>
             </div>
@@ -321,37 +351,76 @@ const TakeQuiz = () => {
     // Result Screen
     if (score !== null) {
         return (
-            <div className="page-container" style={{ textAlign: 'center' }}>
+            <div style={{ 
+                minHeight: '100vh', 
+                background: '#f8fafc', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                padding: '2rem'
+            }}>
                 <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="glass-card"
-                    style={{ maxWidth: '500px', margin: '0 auto', padding: '3rem' }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ 
+                        maxWidth: '500px', 
+                        width: '100%', 
+                        background: 'white', 
+                        borderRadius: '24px', 
+                        padding: '3.5rem 2.5rem',
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
+                        border: '1px solid #e2e8f0',
+                        textAlign: 'center'
+                    }}
                 >
-                    <div style={{ width: '80px', height: '80px', background: 'rgba(52, 211, 153, 0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                        <CheckCircle size={40} color="#34d399" />
+                    <div style={{ 
+                        width: '80px', 
+                        height: '80px', 
+                        background: '#f0fdf4', 
+                        borderRadius: '50%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        margin: '0 auto 2rem',
+                        border: '1px solid #dcfce7'
+                    }}>
+                        <CheckCircle size={40} color="#16a34a" />
                     </div>
-                    <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Quiz Completed!</h2>
-                    <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>Score: {score}</p>
+                    
+                    <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>Quiz Completed!</h2>
+                    <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '2.5rem' }}>You have successfully finished the assessment.</p>
 
-                    {resultId ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <button onClick={() => navigate(`/student/analysis/${resultId}`)} className="btn btn-primary" style={{ width: '100%' }}>
+                    <div style={{ 
+                        background: '#f8fafc', 
+                        padding: '2rem', 
+                        borderRadius: '20px', 
+                        marginBottom: '2.5rem',
+                        border: '1px solid #e2e8f0'
+                    }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Final Score</div>
+                        <div style={{ fontSize: '3.5rem', fontWeight: 900, color: '#3b82f6', lineHeight: '1' }}>
+                            {score} <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>/ {questions.reduce((s, q) => s + q.marks, 0)}</span>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {resultId && (
+                            <button 
+                                onClick={() => navigate(`/student/analysis/${resultId}`)} 
+                                className="btn btn-primary" 
+                                style={{ padding: '1rem', borderRadius: '14px', fontWeight: 700, fontSize: '1rem' }}
+                            >
                                 View Detailed Analysis
                             </button>
-                            <button onClick={downloadResultPDF} className="btn btn-outline" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
-                                <Download size={18} /> Download PDF Report
-                            </button>
-                        </div>
-                    ) : (
-                        <div style={{ padding: '0.8rem', background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.9rem' }}>
-                            Result saved locally. Syncing with server...
-                        </div>
-                    )}
-
-                    <button onClick={() => navigate('/student-dashboard')} className="btn btn-outline" style={{ width: '100%' }}>
-                        Back to Dashboard
-                    </button>
+                        )}
+                        <button 
+                            onClick={() => navigate('/student-dashboard')} 
+                            className="btn" 
+                            style={{ padding: '1rem', borderRadius: '14px', fontWeight: 600, background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}
+                        >
+                            Back to Dashboard
+                        </button>
+                    </div>
                 </motion.div>
             </div>
         );
@@ -366,100 +435,184 @@ const TakeQuiz = () => {
     ];
 
     return (
-        <div className="page-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ 
+            minHeight: '100vh', 
+            background: '#f8fafc', 
+            padding: window.innerWidth < 768 ? '1rem 0.5rem' : '2rem 1rem',
+            color: '#1e293b'
+        }}>
+            <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+                
+                {/* Top Info Bar */}
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: window.innerWidth < 480 ? 'column' : 'row',
+                    justifyContent: 'space-between', 
+                    alignItems: window.innerWidth < 480 ? 'flex-start' : 'center', 
+                    marginBottom: '1.5rem',
+                    background: 'white',
+                    padding: '1rem 1.25rem',
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                    border: '1px solid #e2e8f0',
+                    gap: '1rem'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ fontWeight: 800, fontSize: '1rem', color: '#1e293b' }}>
+                            Question {currentQuestion + 1} 
+                            <span style={{ color: '#64748b', fontWeight: 500, marginLeft: '0.4rem' }}>of {questions.length}</span>
+                        </div>
+                    </div>
 
-            {/* Header: Timer & Progress */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <div>
-                    <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Question {currentQuestion + 1} of {questions.length}</span>
-                    <div style={{ width: '150px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', marginTop: '0.5rem' }}>
-                        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: '100%', background: 'var(--primary)', borderRadius: '3px', transition: 'width 0.3s' }}></div>
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem', 
+                        background: timeLeft < 60 ? '#fef2f2' : '#f1f5f9', 
+                        padding: '0.4rem 0.8rem', 
+                        borderRadius: '10px', 
+                        border: timeLeft < 60 ? '1px solid #fee2e2' : '1px solid #e2e8f0',
+                        width: window.innerWidth < 480 ? '100%' : 'auto',
+                        justifyContent: window.innerWidth < 480 ? 'center' : 'flex-start'
+                    }}>
+                        <Clock size={16} color={timeLeft < 60 ? '#ef4444' : '#64748b'} />
+                        <span style={{ fontSize: '1rem', fontWeight: '800', color: timeLeft < 60 ? '#ef4444' : '#1e293b' }}>
+                            {formatTime(timeLeft)}
+                        </span>
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', background: timeLeft < 60 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(99, 102, 241, 0.1)', padding: '0.6rem 1rem', borderRadius: '30px', border: timeLeft < 60 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid transparent' }}>
-                    <Clock size={18} color={timeLeft < 60 ? '#f87171' : '#818cf8'} />
-                    <span style={{ fontSize: '1.2rem', fontWeight: '700', fontVariantNumeric: 'tabular-nums', color: timeLeft < 60 ? '#f87171' : 'white' }}>
-                        {formatTime(timeLeft)}
-                    </span>
-                </div>
-            </div>
-
-            <motion.div
-                key={currentQuestion}
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className="glass-card"
-                style={{ padding: '3rem', position: 'relative' }}
-            >
-                <div style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '12px', fontSize: '0.85rem', color: '#94a3b8' }}>
-                    {question.marks} Marks
-                </div>
-
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.6', maxWidth: '90%' }}>{question.question}</h3>
-
-                <div style={{ display: 'grid', gap: '1rem' }}>
-                    {options.map((opt) => (
-                        <div
-                            key={opt.key}
-                            onClick={() => handleOptionSelect(opt.key)}
-                            style={{
-                                padding: '1.2rem 1.5rem',
-                                borderRadius: '16px',
-                                background: selectedAnswers[currentQuestion] === opt.key ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255,255,255,0.03)',
-                                border: selectedAnswers[currentQuestion] === opt.key ? '1px solid var(--primary)' : '1px solid transparent',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem',
-                                transition: 'all 0.2s',
-                                fontSize: '1.1rem'
-                            }}
-                        >
-                            <div style={{
-                                width: '24px',
-                                height: '24px',
-                                borderRadius: '50%',
-                                border: selectedAnswers[currentQuestion] === opt.key ? '6px solid var(--primary)' : '2px solid #64748b',
-                                background: 'transparent'
-                            }}></div>
-                            <span>{opt.text}</span>
-                        </div>
-                    ))}
-                </div>
-
-                <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'space-between' }}>
-                    <button
-                        onClick={handlePrevious}
-                        disabled={currentQuestion === 0 || isSubmitting}
-                        className="btn btn-outline"
-                        style={{
-                            padding: '0.8rem 2rem',
-                            fontSize: '1.1rem',
-                            opacity: (currentQuestion === 0 || isSubmitting) ? 0.5 : 1,
-                            cursor: (currentQuestion === 0 || isSubmitting) ? 'not-allowed' : 'pointer',
-                            color: 'white',
-                            borderColor: 'rgba(255,255,255,0.2)'
+                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 1024 ? '1fr' : '1fr 200px', gap: '1.5rem' }}>
+                    {/* Question Card */}
+                    <motion.div
+                        key={currentQuestion}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        style={{ 
+                            padding: window.innerWidth < 768 ? '1.5rem' : '2.5rem', 
+                            borderRadius: '24px',
+                            background: 'white',
+                            border: '1px solid #e2e8f0',
+                            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)'
                         }}
                     >
-                        Previous
-                    </button>
+                        <h3 style={{ fontSize: '1.3rem', fontWeight: 600, marginBottom: '2rem', lineHeight: '1.6' }}>
+                            {question.question}
+                        </h3>
 
-                    <button
-                        onClick={handleNext}
-                        disabled={isSubmitting}
-                        className="btn btn-primary"
-                        style={{ padding: '0.8rem 2rem', fontSize: '1.1rem', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
-                    >
-                        {isSubmitting ? (
-                            <>Please Wait...</>
-                        ) : (
-                            currentQuestion === questions.length - 1 ? 'Finish Exam' : 'Next Question'
-                        )}
-                        {!isSubmitting && <ArrowRight size={20} />}
-                    </button>
+                        <div style={{ display: 'grid', gap: '0.75rem' }}>
+                            {options.map((opt, idx) => {
+                                const isSelected = selectedAnswers[currentQuestion] === opt.key;
+                                return (
+                                    <div
+                                        key={opt.key}
+                                        onClick={() => handleOptionSelect(opt.key)}
+                                        style={{
+                                            padding: '1.1rem 1.5rem',
+                                            borderRadius: '12px',
+                                            background: isSelected ? '#eff6ff' : 'white',
+                                            border: `2px solid ${isSelected ? '#3b82f6' : '#e2e8f0'}`,
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '1rem',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '22px',
+                                            height: '22px',
+                                            borderRadius: '50%',
+                                            border: `2px solid ${isSelected ? '#3b82f6' : '#cbd5e1'}`,
+                                            background: isSelected ? '#3b82f6' : 'white',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            {isSelected && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'white' }}></div>}
+                                        </div>
+                                        <span style={{ fontSize: '1.05rem', color: '#334155' }}>{opt.text}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div style={{ 
+                            display: 'flex', 
+                            flexDirection: window.innerWidth < 400 ? 'column' : 'row',
+                            justifyContent: 'space-between', 
+                            marginTop: '2.5rem',
+                            gap: '1rem'
+                        }}>
+                            <button
+                                onClick={handlePrevious}
+                                disabled={currentQuestion === 0}
+                                style={{ 
+                                    padding: '0.75rem 1.5rem', 
+                                    background: 'white', 
+                                    border: '1px solid #cbd5e1',
+                                    borderRadius: '10px', 
+                                    fontWeight: 600, 
+                                    cursor: currentQuestion === 0 ? 'not-allowed' : 'pointer',
+                                    opacity: currentQuestion === 0 ? 0.5 : 1,
+                                    width: window.innerWidth < 400 ? '100%' : 'auto'
+                                }}
+                            >
+                                Previous
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                className="btn btn-primary"
+                                style={{ 
+                                    padding: '0.75rem 2rem', 
+                                    borderRadius: '10px',
+                                    fontWeight: 700,
+                                    width: window.innerWidth < 400 ? '100%' : 'auto'
+                                }}
+                            >
+                                {currentQuestion === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+                            </button>
+                        </div>
+                    </motion.div>
+
+                    {/* Simple Right Sidebar Navigation */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ 
+                            padding: '1.25rem', 
+                            background: 'white', 
+                            borderRadius: '20px', 
+                            border: '1px solid #e2e8f0',
+                            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+                        }}>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase' }}>Jump to:</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                                {questions.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setCurrentQuestion(idx)}
+                                        style={{
+                                            aspectRatio: '1',
+                                            borderRadius: '8px',
+                                            fontSize: '0.85rem',
+                                            fontWeight: 700,
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            border: '1px solid',
+                                            background: currentQuestion === idx ? '#3b82f6' : !!selectedAnswers[idx] ? '#dbeafe' : '#f1f5f9',
+                                            borderColor: currentQuestion === idx ? '#3b82f6' : !!selectedAnswers[idx] ? '#bfdbfe' : '#e2e8f0',
+                                            color: currentQuestion === idx ? 'white' : !!selectedAnswers[idx] ? '#1e40af' : '#64748b'
+                                        }}
+                                    >
+                                        {idx + 1}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };

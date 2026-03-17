@@ -32,7 +32,7 @@ const CreateQuiz = () => {
     };
 
     return (
-        <div style={{ padding: '8rem 2rem 2rem', maxWidth: '800px', margin: '0 auto', minHeight: '90vh' }}>
+        <div style={{ padding: window.innerWidth < 768 ? '4rem 1rem 1rem' : '8rem 2rem 2rem', maxWidth: '800px', margin: '0 auto', minHeight: '90vh' }}>
             <motion.button
                 whileHover={{ x: -5 }}
                 onClick={() => navigate(-1)}
@@ -45,7 +45,7 @@ const CreateQuiz = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-card"
-                style={{ padding: '4rem', position: 'relative', overflow: 'hidden' }}
+                style={{ padding: window.innerWidth < 768 ? '1.5rem' : '4rem', position: 'relative', overflow: 'hidden' }}
             >
                 {/* Decor elements */}
                 <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', background: 'var(--primary)', filter: 'blur(100px)', opacity: 0.2 }}></div>
@@ -55,8 +55,8 @@ const CreateQuiz = () => {
                 </h1>
                 <p style={{ color: '#94a3b8', marginBottom: '3rem' }}>Set up the details for your new examination.</p>
 
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '2.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'grid', gap: window.innerWidth < 768 ? '1.5rem' : '2.5rem' }}>
+                    <div className="flex-mobile-column" style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '2fr 1fr', gap: '2rem' }}>
                         <div>
                             <label style={{ display: 'block', marginBottom: '0.8rem', color: '#cbd5e1', fontWeight: '500' }}>Quiz Title</label>
                             <input

@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
+import ForgotPassword from './pages/auth/ForgotPassword';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import CreateQuiz from './pages/teacher/CreateQuiz';
 import AddQuestion from './pages/teacher/AddQuestion';
@@ -11,6 +12,7 @@ import TakeQuiz from './pages/student/TakeQuiz';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ExamAnalysis from './pages/student/ExamAnalysis';
+import Profile from './pages/Profile';
 
 // Layout component to handle conditional Navbar visibility
 const Layout = () => {
@@ -28,6 +30,7 @@ const Layout = () => {
         <Route path="/student/login" element={<Login userType="student" />} />
         <Route path="/teacher/login" element={<Login userType="teacher" />} />
         <Route path="/student/signup" element={<Signup userType="student" />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         {/* Teacher signup is removed as they are created by admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -43,6 +46,9 @@ const Layout = () => {
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/student/take-quiz/:courseId" element={<TakeQuiz />} />
         <Route path="/student/analysis/:resultId" element={<ExamAnalysis />} />
+        
+        {/* Common Routes */}
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </>
   );
