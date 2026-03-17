@@ -48,10 +48,10 @@ const Signup = ({ userType }) => {
     return (
         <div className="auth-fullscreen-center">
             <div className="auth-bg-soft"></div>
-            
+
             {/* Duplicate Brand Link removed as Navbar is now visible */}
 
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="auth-card-v3 wider-signup"
@@ -124,10 +124,10 @@ const Signup = ({ userType }) => {
                         </div>
                     </div>
 
-                    <button 
-                        type="submit" 
-                        disabled={loading} 
-                        className="auth-btn-v3" 
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="auth-btn-v3"
                         style={{ backgroundColor: '#4f46e5', marginTop: '1rem' }}
                     >
                         {loading ? "Registering..." : "Create Account"}
@@ -148,10 +148,15 @@ const Signup = ({ userType }) => {
             <style>{`
                 .auth-fullscreen-center {
                     position: relative;
-                    min-height: 100vh;
+                    min-height: calc(100vh - 70px);
                     display: flex; align-items: center; justify-content: center;
                     background-color: #f8fafc; font-family: 'Outfit', sans-serif;
-                    padding: 120px 1rem 60px;
+                    padding: calc(70px + 1.5rem) 1rem 2rem;
+                    box-sizing: border-box;
+                }
+                .auth-card-v3 { max-width: 560px !important; }
+                @media (max-width: 640px) {
+                  .auth-card-v3 { max-width: 100% !important; }
                 }
                 .auth-bg-soft { position: absolute; inset: 0; background-image: radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%); pointer-events: none; }
                 .auth-card-v3 { background: white; width: 100%; max-width: 450px; padding: 2.5rem; border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; position: relative; z-index: 10; margin: auto; }

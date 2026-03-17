@@ -49,10 +49,10 @@ const Login = ({ userType }) => {
     return (
         <div className="auth-fullscreen-center">
             <div className="auth-bg-soft"></div>
-            
+
             {/* Duplicate Brand Link removed as Navbar is now visible */}
 
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="auth-card-v3"
@@ -72,13 +72,13 @@ const Login = ({ userType }) => {
                         <label>Email or Username</label>
                         <div className="auth-input-v3">
                             <Mail size={18} className="auth-input-ico" />
-                            <input 
-                                type="text" 
-                                name="email" 
-                                placeholder="Email or Username" 
-                                value={formData.email} 
-                                onChange={handleChange} 
-                                required 
+                            <input
+                                type="text"
+                                name="email"
+                                placeholder="Email or Username"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
                             />
                         </div>
                     </div>
@@ -90,21 +90,21 @@ const Login = ({ userType }) => {
                         </div>
                         <div className="auth-input-v3">
                             <Lock size={18} className="auth-input-ico" />
-                            <input 
-                                type="password" 
-                                name="password" 
-                                placeholder="••••••••" 
-                                value={formData.password} 
-                                onChange={handleChange} 
-                                required 
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="••••••••"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
                             />
                         </div>
                     </div>
 
-                    <button 
-                        type="submit" 
-                        disabled={loading} 
-                        className="auth-btn-v3" 
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="auth-btn-v3"
                         style={{ backgroundColor: primaryColor }}
                     >
                         {loading ? "Signing in..." : "Sign In"}
@@ -129,10 +129,15 @@ const Login = ({ userType }) => {
             <style>{`
                 .auth-fullscreen-center {
                     position: relative;
-                    min-height: 100vh;
+                    min-height: calc(100vh - 70px);
                     display: flex; align-items: center; justify-content: center;
                     background-color: #f1f5f9; font-family: 'Outfit', sans-serif;
-                    padding: 120px 1rem 40px;
+                    padding: calc(70px + 1.5rem) 1rem 2rem;
+                    box-sizing: border-box;
+                }
+                .auth-card-v3 { max-width: 520px !important; }
+                @media (max-width: 640px) {
+                  .auth-card-v3 { max-width: 100% !important; }
                 }
                 .auth-bg-soft {
                     position: absolute; inset: 0;
