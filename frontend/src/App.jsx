@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
@@ -14,11 +15,59 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ExamAnalysis from './pages/student/ExamAnalysis';
 import Profile from './pages/Profile';
 
-// Layout component to handle conditional Navbar visibility
+// Layout component to handle conditional Navbar visibility and auto-logout on back/forward
 const Layout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const clearFlagTimeout = useRef(null);
+
   // Hide Navbar on TakeQuiz page
   const hideNavbar = location.pathname.includes('/student/take-quiz');
+
+  useEffect(() => {
+    const LOGOUT_FLAG_KEY = 'quizmaster_back_nav_flag';
+
+    const isLoggedIn = () => {
+      return Boolean(localStorage.getItem('user') || localStorage.getItem('admin'));
+    };
+
+    const logout = () => {
+      localStorage.removeItem('user');
+      localStorage.removeItem('admin');
+      navigate('/student/login');
+    };
+
+    const clearFlag = () => {
+      sessionStorage.removeItem(LOGOUT_FLAG_KEY);
+      if (clearFlagTimeout.current) {
+        window.clearTimeout(clearFlagTimeout.current);
+        clearFlagTimeout.current = null;
+      }
+    };
+
+    const handlePopState = () => {
+      // If the user is not logged in, ignore
+      if (!isLoggedIn()) return;
+
+      const wasBack = sessionStorage.getItem(LOGOUT_FLAG_KEY) === 'true';
+      if (wasBack) {
+        // The user navigated back before; now they are going forward.
+        clearFlag();
+        logout();
+        return;
+      }
+
+      // First popstate event (likely a back navigation). Set a short-lived flag.
+      sessionStorage.setItem(LOGOUT_FLAG_KEY, 'true');
+      clearFlagTimeout.current = window.setTimeout(clearFlag, 1500);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      clearFlag();
+    };
+  }, [navigate]);
 
   return (
     <>
@@ -46,7 +95,7 @@ const Layout = () => {
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/student/take-quiz/:courseId" element={<TakeQuiz />} />
         <Route path="/student/analysis/:resultId" element={<ExamAnalysis />} />
-        
+
         {/* Common Routes */}
         <Route path="/profile" element={<Profile />} />
       </Routes>
