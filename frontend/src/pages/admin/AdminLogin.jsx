@@ -38,34 +38,33 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="perfect-center-container admin-bg-center">
-            {/* Background pattern */}
-            <div style={{ position: 'absolute', inset: 0, opacity: 0.1, pointerEvents: 'none', background: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-
+        <div className="auth-fullscreen-center">
+            <div className="auth-bg-soft admin-gradient"></div>
+            
             <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="auth-card-simple admin-card-border"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="auth-card-v3 admin-border"
             >
-                <div className="auth-card-header">
-                    <div className="auth-icon-circle" style={{ background: '#f8fafc' }}>
+                <div className="auth-header-v3">
+                    <div className="auth-icon-v3" style={{ background: '#f1f5f9' }}>
                         <ShieldCheck size={32} color="#0f172a" />
                     </div>
-                    <h1>Admin Login</h1>
-                    <p>Enter administrative credentials to proceed.</p>
+                    <h2>Admin Portal</h2>
+                    <p>Enter administrative credentials to proceed</p>
                 </div>
 
-                {error && <div className="auth-error-msg admin-err-msg">{error}</div>}
+                {error && <div className="auth-error-v3">{error}</div>}
 
-                <form onSubmit={handleSubmit} className="auth-form-simple">
-                    <div className="auth-input-group">
+                <form onSubmit={handleSubmit} className="auth-form-v3">
+                    <div className="auth-field-v3">
                         <label>Admin Email / ID</label>
-                        <div className="auth-input-field">
-                            <Mail size={18} className="auth-input-icon" />
+                        <div className="auth-input-v3">
+                            <Mail size={18} className="auth-input-ico" />
                             <input 
                                 type="text" 
                                 name="email" 
-                                placeholder="admin or admin@quizmaster.com" 
+                                placeholder="Admin ID or Email" 
                                 value={formData.email} 
                                 onChange={handleChange} 
                                 required 
@@ -73,10 +72,10 @@ const AdminLogin = () => {
                         </div>
                     </div>
 
-                    <div className="auth-input-group">
+                    <div className="auth-field-v3">
                         <label>Secret Key</label>
-                        <div className="auth-input-field">
-                            <Lock size={18} className="auth-input-icon" />
+                        <div className="auth-input-v3">
+                            <Lock size={18} className="auth-input-ico" />
                             <input 
                                 type="password" 
                                 name="password" 
@@ -91,16 +90,17 @@ const AdminLogin = () => {
                     <button 
                         type="submit" 
                         disabled={loading} 
-                        className="auth-main-btn admin-solid-btn"
+                        className="auth-btn-v3" 
+                        style={{ backgroundColor: '#0f172a' }}
                     >
                         {loading ? "Verifying..." : "Unlock Dashboard"}
                         {!loading && <ArrowRight size={18} />}
                     </button>
                 </form>
 
-                <div className="auth-card-footer">
-                    <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem' }}>
-                        <Link to="/" style={{ color: '#0f172a', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: '600' }}>
+                <div className="auth-footer-v3">
+                    <div style={{ marginTop: '1.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
+                        <Link to="/" style={{ color: '#64748b', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: '600' }}>
                             <ArrowLeft size={14} /> Back to Home
                         </Link>
                     </div>
@@ -108,131 +108,65 @@ const AdminLogin = () => {
             </motion.div>
 
             <style>{`
-                .perfect-center-container {
+                .auth-fullscreen-center {
                     position: relative;
                     min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #0f172a;
+                    display: flex; align-items: center; justify-content: center;
+                    background-color: #f1f5f9; font-family: 'Outfit', sans-serif;
                     padding: 120px 1rem 40px;
-                    font-family: 'Inter', sans-serif;
                 }
-                .admin-bg-center {
+                .auth-bg-soft {
+                    position: absolute; inset: 0;
+                    background-image: radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.05) 0px, transparent 50%),
+                                      radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.05) 0px, transparent 50%);
+                    pointer-events: none;
+                }
+                .admin-gradient {
                     background-color: #0f172a;
                     background-image: radial-gradient(circle at 50% 50%, rgba(51, 65, 85, 0.4) 0%, transparent 100%);
                 }
-                .auth-card-simple {
-                    background: white;
-                    width: 100%;
-                    max-width: 400px;
-                    padding: 2.5rem 2rem;
-                    border-radius: 20px;
-                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-                    position: relative;
-                    z-index: 10;
+                .auth-card-v3 {
+                    background: white; width: 100%; max-width: 400px;
+                    padding: 2.5rem 2rem; border-radius: 24px;
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #e2e8f0; position: relative; z-index: 10;
                 }
-                .admin-card-border {
+                .admin-border {
                     border: 1px solid rgba(255, 255, 255, 0.1);
                 }
-                .auth-card-header {
-                    text-align: center;
-                    margin-bottom: 2rem;
+                .auth-header-v3 { text-align: center; margin-bottom: 1.5rem; }
+                .auth-icon-v3 { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+                .auth-header-v3 h2 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem; }
+                .auth-header-v3 p { color: #64748b; font-size: 0.9rem; }
+                
+                .auth-error-v3 {
+                    background: #fff1f2; color: #e11d48; padding: 0.75rem; border-radius: 12px; margin-bottom: 1.5rem;
+                    text-align: center; font-size: 0.85rem; font-weight: 600; border: 1px solid #ffe4e6;
                 }
-                .auth-icon-circle {
-                    width: 52px;
-                    height: 52px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 auto 1rem;
+                .auth-form-v3 { display: flex; flex-direction: column; gap: 1.5rem; }
+                .auth-field-v3 label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+                
+                .auth-input-v3 { position: relative; }
+                .auth-input-ico { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+                .auth-input-v3 input {
+                    width: 100%; padding: 0.85rem 1rem 0.85rem 3rem; border-radius: 12px;
+                    border: 1.5px solid #e2e8f0; background: #f8fafc; font-size: 1rem;
+                    box-sizing: border-box; transition: all 0.2s;
                 }
-                .auth-card-header h1 {
-                    font-size: 1.5rem;
-                    font-weight: 800;
-                    color: #0f172a;
-                    margin-bottom: 0.5rem;
+                .auth-input-v3 input:focus { border-color: #0f172a; background: white; outline: none; }
+                
+                .auth-btn-v3 {
+                    padding: 1rem; border-radius: 12px; color: white; font-weight: 700;
+                    border: none; cursor: pointer; display: flex; align-items: center;
+                    justify-content: center; gap: 8px; margin-top: 0.5rem; font-size: 1rem;
                 }
-                .auth-card-header p {
-                    color: #64748b;
-                    font-size: 0.9rem;
-                }
-                .admin-err-msg {
-                    background-color: #fee2e2;
-                    color: #b91c1c;
-                    padding: 0.75rem;
-                    border-radius: 12px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    text-align: center;
-                    margin-bottom: 1.5rem;
-                    border: 1px solid #fecaca;
-                }
-                .auth-form-simple {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1.5rem;
-                }
-                .auth-input-group label {
-                    display: block;
-                    font-size: 0.75rem;
-                    font-weight: 800;
-                    color: #475569;
-                    margin-bottom: 0.4rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-                .auth-input-field {
-                    position: relative;
-                }
-                .auth-input-icon {
-                    position: absolute;
-                    left: 1rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #94a3b8;
-                }
-                .auth-input-field input {
-                    width: 100%;
-                    padding: 0.9rem 1rem 0.9rem 3.2rem;
-                    border-radius: 12px;
-                    border: 2px solid #f1f5f9;
-                    background-color: #f8fafc;
-                    font-size: 1rem;
-                    box-sizing: border-box;
-                    transition: all 0.2s;
-                }
-                .auth-input-field input:focus {
-                    outline: none;
-                    border-color: #3b82f6;
-                    background-color: white;
-                }
-                .admin-solid-btn {
-                    padding: 1rem;
-                    background-color: #0f172a !important;
-                    border-radius: 12px;
-                    color: white;
-                    font-weight: 800;
-                    border: none;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 0.5rem;
-                    font-size: 1rem;
-                }
-                .auth-card-footer {
-                    text-align: center;
-                    margin-top: 1.5rem;
-                    font-size: 0.9rem;
-                    color: #64748b;
-                }
+                .auth-footer-v3 { text-align: center; margin-top: 1.5rem; color: #64748b; font-size: 0.9rem; }
+                .auth-footer-v3 a { text-decoration: none; font-weight: 700; }
                 @media (max-width: 480px) {
-                    .perfect-center-container { padding: 90px 0.75rem 40px; }
-                    .auth-card-simple { padding: 2rem 1.25rem; border-radius: 20px; width: 100%; max-width: none; }
-                    .auth-card-header h1 { font-size: 1.3rem; }
-                    .auth-form-simple { gap: 1.25rem; }
+                    .auth-fullscreen-center { padding: 90px 0.75rem 40px; }
+                    .auth-card-v3 { padding: 2rem 1.25rem; border-radius: 20px; width: 100%; max-width: none; }
+                    .auth-header-v3 h2 { font-size: 1.3rem; }
+                    .auth-form-v3 { gap: 1.25rem; }
                 }
             `}</style>
         </div>

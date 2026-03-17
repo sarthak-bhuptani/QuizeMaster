@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, BookOpen, Trophy, Activity, Clock,
     ArrowRight, Search, Zap, Award, User, Bell,
-    ChevronRight, Target, Flame, LogOut, Menu, X, Sparkles, Brain
+    ChevronRight, Target, Flame, LogOut, Sparkles, Brain
 } from 'lucide-react';
 import api from '../../services/api';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
@@ -19,7 +19,6 @@ const StudentDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [user, setUser] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
 
     // Sync state with URL params
     useEffect(() => {
@@ -32,7 +31,6 @@ const StudentDashboard = () => {
     const handleTabChange = (newTab) => {
         setSearchParams({ tab: newTab });
         setActiveTab(newTab);
-        setSidebarOpen(false);
     };
 
     useEffect(() => {
@@ -115,17 +113,11 @@ const StudentDashboard = () => {
 
     return (
         <div className="dashboard-container">
-            {/* Mobile Overlay */}
-            <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
-
             {/* Sidebar */}
-            <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+            <div className="dashboard-sidebar hide-on-mobile">
                 <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
                     <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Student Portal</span>
-                    <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                        <X size={24} />
-                    </button>
                 </div>
 
                 <div style={{ padding: '0 1.5rem 2.5rem' }} className="nav-items-container">
@@ -162,13 +154,6 @@ const StudentDashboard = () => {
 
             {/* Main Content */}
             <div className="dashboard-content">
-                <button
-                    className="mobile-menu-btn hide-on-desktop hide-on-mobile"
-                    onClick={() => setSidebarOpen(true)}
-                    style={{ display: 'none' }} // Controlled by CSS media queries
-                >
-                    <Menu size={24} />
-                </button>
 
                 <div className="dashboard-header-flex">
                     <div style={{ flex: 1 }}>

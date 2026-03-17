@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { User, Mail, Phone, MapPin, Lock, Camera, Save, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +18,7 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
+    const fileInputRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -60,14 +61,47 @@ const Profile = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Size check (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            setMessage({ type: 'error', text: 'Image size should be less than 2MB' });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64String = reader.result;
+            setSaving(true);
+            try {
+                const role = userData?.xp !== undefined ? 'student' : 'teacher';
+                const id = userData?._id;
+                await api.put(`/${role}/${id}`, { profile_pic: base64String });
+                setUserData({ ...userData, profile_pic: base64String });
+                setMessage({ type: 'success', text: 'Profile picture updated!' });
+            } catch (err) {
+                setMessage({ type: 'error', text: 'Failed to upload image' });
+            } finally {
+                setSaving(false);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const triggerFileSelect = () => {
+        fileInputRef.current?.click();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         setMessage({ type: '', text: '' });
 
         try {
-            const role = userData.xp !== undefined ? 'student' : 'teacher';
-            const id = userData._id;
+            const role = userData?.xp !== undefined ? 'student' : 'teacher';
+            const id = userData?._id;
             
             const payload = { ...formData };
             if (!payload.password) delete payload.password; // Only send password if changed
@@ -128,33 +162,44 @@ const Profile = () => {
                         <div className="profile-card profile-main-card">
                             <div className="profile-avatar-wrapper">
                                 <div className="profile-avatar-large">
-                                    {formData.first_name.charAt(0).toUpperCase()}
+                                    {userData?.profile_pic ? (
+                                        <img src={userData.profile_pic} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                    ) : (
+                                        formData.first_name.charAt(0).toUpperCase()
+                                    )}
                                 </div>
-                                <button className="avatar-edit-btn">
+                                <button className="avatar-edit-btn" onClick={triggerFileSelect}>
                                     <Camera size={16} />
                                 </button>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    onChange={handleFileChange} 
+                                    style={{ display: 'none' }} 
+                                    accept="image/*"
+                                />
                             </div>
                             <h2>{formData.first_name} {formData.last_name}</h2>
                             <span className="profile-role-badge">
-                                {userData.xp !== undefined ? 'Student' : 'Teacher'}
+                                {userData?.xp !== undefined ? 'Student' : 'Teacher'}
                             </span>
                             
                             <div className="profile-stats-row">
-                                {userData.xp !== undefined ? (
+                                {userData?.xp !== undefined ? (
                                     <>
                                         <div className="stat-item">
-                                            <span className="stat-value">{userData.xp}</span>
+                                            <span className="stat-value">{userData?.xp || 0}</span>
                                             <span className="stat-label">XP Points</span>
                                         </div>
                                         <div className="stat-divider"></div>
                                         <div className="stat-item">
-                                            <span className="stat-value">Lvl {userData.level}</span>
+                                            <span className="stat-value">Lvl {userData?.level || 1}</span>
                                             <span className="stat-label">Level</span>
                                         </div>
                                     </>
                                 ) : (
                                     <div className="stat-item">
-                                        <span className="stat-value">{userData.status ? 'Active' : 'Pending'}</span>
+                                        <span className="stat-value">{userData?.status ? 'Active' : 'Pending'}</span>
                                         <span className="stat-label">Account Status</span>
                                     </div>
                                 )}
@@ -163,7 +208,7 @@ const Profile = () => {
 
                         <div className="profile-card info-card">
                             <h3>Account Security</h3>
-                            <p className="card-info-text">Last updated {new Date(userData.updatedAt).toLocaleDateString()}</p>
+                            <p className="card-info-text">Last updated {userData?.updatedAt ? new Date(userData.updatedAt).toLocaleDateString() : 'N/A'}</p>
                             <div className="security-item">
                                 <CheckCircle2 size={16} color="#10b981" />
                                 <span>Login Verified</span>
@@ -578,12 +623,25 @@ const Profile = () => {
                 
                 @media (max-width: 900px) {
                     .profile-content-grid { grid-template-columns: 1fr; }
-                    .profile-sidebar { order: 2; }
-                    .profile-main-form { order: 1; }
+                    .profile-sidebar { order: 1; }
+                    .profile-main-form { order: 2; }
+                    .profile-header { text-align: center; }
+                    .back-btn { justify-content: center; width: 100%; }
                 }
-                @media (max-width: 600px) {
+
+                @media (max-width: 640px) {
+                    .profile-page-wrapper { padding: 90px 15px 30px; }
+                    .profile-header h1 { font-size: 1.75rem; }
+                    .profile-header p { font-size: 0.95rem; }
+                    .profile-card { padding: 1.5rem; }
                     .input-grid { grid-template-columns: 1fr; }
                     .full-width { grid-column: span 1; }
+                    .form-footer { justify-content: center; }
+                    .profile-save-btn { width: 100%; justify-content: center; }
+                    .profile-avatar-large { width: 100px; height: 100px; font-size: 2.5rem; }
+                    .profile-avatar-wrapper { width: 100px; height: 100px; }
+                    .profile-stats-row { gap: 1rem; }
+                    .stat-value { font-size: 1.1rem; }
                 }
             `}</style>
         </div>

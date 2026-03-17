@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, Users, BookOpen, UserCheck, Trash2, CheckSquare,
-    LayoutDashboard, GraduationCap, Brain, Menu, X, Search, LogOut, Edit
+    LayoutDashboard, GraduationCap, Brain, Search, LogOut, Edit
 } from 'lucide-react';
 import api from '../../services/api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -19,7 +19,6 @@ const AdminDashboard = () => {
     const [data, setData] = useState({ teachers: [], students: [], courses: [] });
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Menu State
     const [editingEntity, setEditingEntity] = useState(null); // { type: 'student'|'teacher', data: {} }
     const [showEditModal, setShowEditModal] = useState(false);
 
@@ -33,7 +32,6 @@ const AdminDashboard = () => {
     const handleTabChange = (newTab) => {
         setSearchParams({ tab: newTab });
         setActiveTab(newTab);
-        setSidebarOpen(false);
     };
 
     useEffect(() => {
@@ -152,15 +150,24 @@ const AdminDashboard = () => {
         </button>
     );
 
-    const StatCard = ({ label, value, icon: Icon, colorClass }) => (
-        <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', padding: '1.5rem' }}>
-            <div className={`p-3 rounded-xl ${colorClass.replace('text-', 'bg-')}-soft`} style={{ padding: '1rem', borderRadius: '12px' }}>
-                <Icon size={28} className={colorClass} />
+    const StatCard = ({ label, value, sub, icon: Icon, colorClass }) => (
+        <div className="glass-card" style={{ position: 'relative', overflow: 'hidden', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+                <div style={{ padding: '0.85rem', borderRadius: '14px', background: 'var(--bg-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon size={24} className={colorClass} />
+                </div>
+                <div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.2rem' }}>{label}</div>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{value}</div>
+                </div>
             </div>
-            <div>
-                <h3 style={{ fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>{value}</h3>
-                <p style={{ margin: 0, fontSize: '0.9rem' }} className="text-secondary">{label}</p>
-            </div>
+            {sub && (
+                <div style={{ marginTop: '1.2rem', paddingTop: '0.8rem', borderTop: '1px solid #f1f5f9', fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>
+                    {sub}
+                </div>
+            )}
+            {/* Visual Decoration */}
+            <Icon size={70} style={{ position: 'absolute', right: '-15px', bottom: '-15px', opacity: 0.04, transform: 'rotate(-15deg)' }} />
         </div>
     );
 
@@ -186,17 +193,11 @@ const AdminDashboard = () => {
 
     return (
         <div className="dashboard-container">
-            {/* Mobile Overlay */}
-            <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
-
-            {/* Sidebar */}
-            <div className={`dashboard-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+            {/* Desktop-only Sidebar */}
+            <div className="dashboard-sidebar hide-on-mobile">
                 <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
                     <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Admin Portal</span>
-                    <button onClick={() => setSidebarOpen(false)} className="hide-on-desktop show-on-mobile-flex" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                        <X size={24} />
-                    </button>
                 </div>
 
                 <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -223,13 +224,6 @@ const AdminDashboard = () => {
 
             {/* Main Content */}
             <div className="dashboard-content">
-                <button
-                    className="mobile-menu-btn hide-on-desktop hide-on-mobile"
-                    onClick={() => setSidebarOpen(true)}
-                    style={{ display: 'none' }} // Controlled by CSS media queries
-                >
-                    <Menu size={24} />
-                </button>
 
                 <div className="dashboard-header-flex">
                     <div style={{ flex: 1 }}>
@@ -285,10 +279,10 @@ const AdminDashboard = () => {
                         {activeTab === 'overview' && (
                             <>
                                 <div className="stats-grid">
-                                    <StatCard label="Total Students" value={stats.totalStudents} icon={Users} colorClass="text-success" />
-                                    <StatCard label="Total Teachers" value={stats.totalTeachers} icon={GraduationCap} colorClass="text-primary" />
-                                    <StatCard label="Active Quizzes" value={stats.totalCourses} icon={BookOpen} colorClass="text-accent" />
-                                    <StatCard label="Pending Approvals" value={stats.pendingTeachers} icon={UserCheck} colorClass="text-warning" />
+                                    <StatCard label="Total Students" value={stats.totalStudents} sub="Registered students" icon={Users} colorClass="text-success" />
+                                    <StatCard label="Total Teachers" value={stats.totalTeachers} sub="Verified instructors" icon={GraduationCap} colorClass="text-primary" />
+                                    <StatCard label="Active Quizzes" value={stats.totalCourses} sub="Live across platform" icon={BookOpen} colorClass="text-accent" />
+                                    <StatCard label="Pending Approvals" value={stats.pendingTeachers} sub="Teachers awaiting access" icon={UserCheck} colorClass="text-warning" />
                                 </div>
 
                                 {/* Analytics Section */}

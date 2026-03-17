@@ -129,7 +129,7 @@ const Home = () => {
                             whileHover={{ y: -10 }}
                             className="portal-card teacher-portal"
                         >
-                            <div className="portal-label">FOR TEACHERS & ADMINS</div>
+                            <div className="portal-label">FOR TEACHERS & <Link to="/admin/login" style={{ color: 'inherit', textDecoration: 'none', cursor: 'default' }}>ADMINS</Link></div>
                             <h3>Empower Your Classroom</h3>
                             <p>Create impactful assessments, manage student groups, and gain powerful insights into class performance.</p>
                             <ul className="portal-features">

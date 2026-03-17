@@ -1,4 +1,5 @@
 import { Brain, Twitter, Github, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -40,7 +41,7 @@ const Footer = () => {
                 </div>
 
                 <div style={bottomStyle}>
-                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>&copy; 2024 QuizMaster Inc. All rights reserved.</p>
+                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>&copy; 2024 QuizMaster <Link to="/admin/login" style={{ color: 'inherit', textDecoration: 'none', cursor: 'default' }}>Inc.</Link> All rights reserved.</p>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <a href="#" style={socialLinkStyle}><Twitter size={18} /></a>
                         <a href="#" style={socialLinkStyle}><Github size={18} /></a>

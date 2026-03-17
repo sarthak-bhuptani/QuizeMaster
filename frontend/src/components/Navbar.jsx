@@ -1,6 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { LogOut, LayoutDashboard, UserCircle, School, ShieldCheck, Menu, X, Brain, ChevronDown } from 'lucide-react';
+import { 
+    LogOut, LayoutDashboard, UserCircle, School, ShieldCheck, 
+    Menu, X, ChevronDown, BookOpen, Trophy, Activity, Target
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Navbar.css';
 
@@ -63,7 +66,36 @@ const Navbar = () => {
         navigate('/');
     };
 
-    const dashboardPath = user ? (user.role === 'Admin' ? '/admin-dashboard' : user.role === 'Teacher' ? '/teacher-dashboard' : '/student-dashboard') : null;
+    const dashboardPath = user ? (
+        user.role === 'Admin' ? '/admin-dashboard' : 
+        user.role === 'Teacher' ? '/teacher-dashboard' : 
+        '/student-dashboard'
+    ) : null;
+
+    const isDashboard = location.pathname.includes('dashboard');
+
+    const dashboardLinks = {
+        Student: [
+            { label: 'My Overview', id: 'overview', icon: LayoutDashboard },
+            { label: 'Available Exams', id: 'exams', icon: BookOpen },
+            { label: 'Result History', id: 'history', icon: Activity },
+            { label: 'Hall of Fame', id: 'leaderboard', icon: Trophy },
+        ],
+        Teacher: [
+            { label: 'Dashboard', id: 'overview', icon: LayoutDashboard },
+            { label: 'My Quizzes', id: 'quizzes', icon: BookOpen },
+            { label: 'Students', id: 'students', icon: UserCircle },
+            { label: 'Results', id: 'results', icon: Trophy },
+        ],
+        Admin: [
+            { label: 'Overview', id: 'overview', icon: LayoutDashboard },
+            { label: 'Students', id: 'students', icon: UserCircle },
+            { label: 'Teachers', id: 'teachers', icon: School },
+            { label: 'Quizzes', id: 'courses', icon: BookOpen },
+        ]
+    };
+
+    const currentDashboardLinks = user && dashboardLinks[user.role] ? dashboardLinks[user.role] : [];
 
     return (
         <>
@@ -85,7 +117,7 @@ const Navbar = () => {
                     <div className="nav-actions">
                         {user ? (
                             <div className="nav-profile-wrapper" ref={profileMenuRef} style={{ position: 'relative' }}>
-                                <button className="user-pill" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+                                <button className="user-pill hide-on-mobile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
                                     <div className="pill-avatar">
                                         {(user.name || user.username || 'U').charAt(0).toUpperCase()}
                                     </div>
@@ -121,7 +153,7 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <div className="login-context" ref={loginMenuRef} style={{ position: 'relative' }}>
-                                    <button className="btn-login-ghost" onClick={() => setShowLoginMenu(!showLoginMenu)}>
+                                    <button className="btn-login-ghost hide-on-mobile" onClick={() => setShowLoginMenu(!showLoginMenu)}>
                                         Login <ChevronDown size={14} />
                                     </button>
                                     <AnimatePresence>
@@ -138,15 +170,11 @@ const Navbar = () => {
                                                 <Link to="/teacher/login" className="dropdown-link">
                                                     <School size={18} /> Teacher Access
                                                 </Link>
-                                                <div style={{ borderTop: '1px solid rgba(0,0,0,0.05)', margin: '4px 0' }}></div>
-                                                <Link to="/admin/login" className="dropdown-link">
-                                                    <ShieldCheck size={18} /> Administrative
-                                                </Link>
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
                                 </div>
-                                <Link to="/student/signup" className="btn-get-started">Start Learning</Link>
+                                <Link to="/student/signup" className="btn-get-started hide-on-mobile">Start Learning</Link>
                             </>
                         )}
 
@@ -159,11 +187,12 @@ const Navbar = () => {
                 <style>{`
                     @media (max-width: 1024px) {
                         .btn-mobile-toggle { display: block !important; }
+                        .hide-on-mobile { display: none !important; }
                     }
                 `}</style>
             </nav>
 
-            {/* Mobile Sidebar - Rendered outside the fixed navbar to avoid transform issues */}
+            {/* Mobile Sidebar - Enhanced for Dashboard */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <>
@@ -182,31 +211,84 @@ const Navbar = () => {
                             className="mobile-drawer"
                         >
                             <div className="drawer-header">
-                                <span className="brand-title" style={{ display: 'block' }}>Menu</span>
-                                <button onClick={() => setMobileMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                                    <X size={24} color="#0f172a" />
+                                <div className="drawer-brand">
+                                    <div className="drawer-logo-wrapper">
+                                        <img src="/logo.png" alt="QuizMaster" />
+                                    </div>
+                                    <div className="brand-info-text">
+                                        <span className="portal-name">{user ? `${user.role} Portal` : 'QuizMaster'}</span>
+                                        <span className="app-label">Master your skills</span>
+                                    </div>
+                                </div>
+                                <button className="drawer-close-btn" onClick={() => setMobileMenuOpen(false)}>
+                                    <X size={20} />
                                 </button>
                             </div>
                             
                             <div className="drawer-nav">
+                                {user && (
+                                    <div className="mobile-user-card">
+                                        <div className="user-card-head">
+                                            <div className="pill-avatar large">
+                                                {(user.name || user.username || 'U').charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="user-card-info">
+                                                <div className="user-card-name">{user.name || user.username}</div>
+                                                <div className="user-card-role">{user.role} Account</div>
+                                            </div>
+                                        </div>
+                                        <div className="user-card-stats">
+                                            <div className="stat-item">
+                                                <span className="stat-value">Active</span>
+                                                <span className="stat-label">Status</span>
+                                            </div>
+                                            <div className="stat-divider"></div>
+                                            <div className="stat-item">
+                                                <span className="stat-value">v1.2</span>
+                                                <span className="stat-label">Version</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="drawer-section-label">Main Navigation</div>
                                 <Link to="/" className={`drawer-item ${location.pathname === '/' ? 'active' : ''}`}>
-                                    Home
+                                    <Target size={20} /> <span className="item-label">Home</span>
                                 </Link>
-                                {dashboardPath && (
-                                    <Link to={dashboardPath} className={`drawer-item ${location.pathname.includes('dashboard') ? 'active' : ''}`}>
-                                        Dashboard
+
+                                {isDashboard && currentDashboardLinks.length > 0 && (
+                                    <>
+                                        <div className="drawer-section-label">{user?.role} Menu</div>
+                                        {currentDashboardLinks.map((link) => (
+                                            <button 
+                                                key={link.id}
+                                                onClick={() => {
+                                                    navigate(`${dashboardPath}?tab=${link.id}`);
+                                                    setMobileMenuOpen(false);
+                                                }}
+                                                className={`drawer-item ${new URLSearchParams(location.search).get('tab') === link.id || (link.id === 'overview' && !new URLSearchParams(location.search).get('tab')) ? 'active' : ''}`}
+                                            >
+                                                <link.icon size={20} />
+                                                <span className="item-label">{link.label}</span>
+                                            </button>
+                                        ))}
+                                    </>
+                                )}
+
+                                {!isDashboard && dashboardPath && (
+                                    <Link to={dashboardPath} className="drawer-item">
+                                        <LayoutDashboard size={20} /> <span className="item-label">My Dashboard</span>
                                     </Link>
                                 )}
                                 
-                                <div style={{ borderTop: '1px solid #f1f5f9', margin: '0.5rem 0' }}></div>
-                                
+                                <div className="drawer-section-label">Account Settings</div>
                                 {user ? (
                                     <>
                                         <button onClick={() => navigate('/profile')} className="drawer-item">
-                                            <UserCircle size={20} /> My Profile
+                                            <UserCircle size={20} /> <span className="item-label">My Profile</span>
                                         </button>
-                                        <button onClick={handleLogout} className="drawer-item danger" style={{ color: '#ef4444' }}>
-                                            <LogOut size={20} /> Sign Out
+                                        <button onClick={handleLogout} className="drawer-item danger">
+                                            <LogOut size={20} /> <span className="item-label">Sign Out Session</span>
                                         </button>
                                     </>
                                 ) : (
@@ -217,9 +299,11 @@ const Navbar = () => {
                                         <Link to="/teacher/login" className="drawer-item">
                                             <School size={20} /> Teacher Login
                                         </Link>
-                                        <Link to="/student/signup" className="btn-get-started" style={{ textAlign: 'center', marginTop: '1.5rem', display: 'block' }}>
-                                            Start Learning Free
-                                        </Link>
+                                        <div style={{ padding: '0 1rem', marginTop: '1rem' }}>
+                                            <Link to="/student/signup" className="btn-get-started" style={{ textAlign: 'center', display: 'block', width: '100%' }}>
+                                                Start Learning Free
+                                            </Link>
+                                        </div>
                                     </>
                                 )}
                             </div>
