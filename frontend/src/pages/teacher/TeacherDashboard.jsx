@@ -94,6 +94,10 @@ const TeacherDashboard = () => {
             });
             const courseId = courseRes.data._id;
             for (const q of quizQuestions) {
+                // Find which option matches the correct answer
+                const correctIndex = q.options.findIndex(opt => opt === q.correct_answer);
+                const answerKey = correctIndex >= 0 ? `Option${correctIndex + 1}` : 'Option1';
+
                 await api.post('/exam/questions', {
                     course_id: courseId,
                     question: q.question_text,
@@ -101,7 +105,7 @@ const TeacherDashboard = () => {
                     option2: q.options[1],
                     option3: q.options[2],
                     option4: q.options[3],
-                    answer: q.correct_answer,
+                    answer: answerKey,
                     marks: marksPerQ
                 });
             }

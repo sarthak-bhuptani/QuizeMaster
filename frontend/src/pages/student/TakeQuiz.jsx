@@ -271,13 +271,19 @@ const TakeQuiz = () => {
         let totalScore = 0;
         let totalPossible = 0;
         const detailedAnswers = questions.map((q, index) => {
-            const isCorrect = selectedAnswers[index] === q.answer;
-            if (isCorrect) totalScore += q.marks;
-            totalPossible += q.marks;
+            const selectedKey = selectedAnswers[index];
+            const selectedText = selectedKey ? q[selectedKey.toLowerCase()] : null; 
+
+            // Handle both new format ('Option1') and legacy AI format ('Paris')
+            const isCorrect = (selectedKey && q.answer === selectedKey) || (selectedText && q.answer === selectedText);
+            
+            const qMarks = Number(q.marks) || 0;
+            if (isCorrect) totalScore += qMarks;
+            totalPossible += qMarks;
 
             return {
                 question_id: q._id,
-                selected_option: selectedAnswers[index] || null,
+                selected_option: selectedKey || null,
                 is_correct: isCorrect
             };
         });
@@ -320,13 +326,18 @@ const TakeQuiz = () => {
             autoTable(doc, {
                 startY: 90,
                 head: [['#', 'Question', 'Selected', 'Correct', 'Status']],
-                body: questions.map((q, i) => [
-                    i + 1,
-                    q.question,
-                    selectedAnswers[i] || 'None',
-                    q.answer,
-                    selectedAnswers[i] === q.answer ? 'CORRECT' : 'WRONG'
-                ]),
+                body: questions.map((q, i) => {
+                    const selectedKey = selectedAnswers[i];
+                    const selectedText = selectedKey ? q[selectedKey.toLowerCase()] : null;
+                    const isCorrect = (selectedKey && q.answer === selectedKey) || (selectedText && q.answer === selectedText);
+                    return [
+                        i + 1,
+                        q.question,
+                        selectedKey || 'None',
+                        q.answer,
+                        isCorrect ? 'CORRECT' : 'WRONG'
+                    ];
+                }),
                 theme: 'striped',
                 headStyles: { fillColor: [99, 102, 241] }
             });
@@ -350,6 +361,14 @@ const TakeQuiz = () => {
 
     // Result Screen
     if (score !== null) {
+        const totalPossible = questions.reduce((s, q) => s + (Number(q.marks) || 0), 0);
+        const percentage = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
+        
+        let greetMessage = "Good Effort!";
+        if (percentage >= 90) greetMessage = "Outstanding Achievement! 🏆";
+        else if (percentage >= 75) greetMessage = "Great Job! 🌟";
+        else if (percentage >= 50) greetMessage = "Well Done! 👍";
+
         return (
             <div style={{ 
                 minHeight: '100vh', 
@@ -357,69 +376,122 @@ const TakeQuiz = () => {
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                padding: '2rem'
+                padding: '1rem'
             }}>
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
                     style={{ 
-                        maxWidth: '500px', 
+                        maxWidth: '450px', 
                         width: '100%', 
+                        maxHeight: '90vh',
+                        display: 'flex',
+                        flexDirection: 'column',
                         background: 'white', 
-                        borderRadius: '24px', 
-                        padding: '3.5rem 2.5rem',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
-                        border: '1px solid #e2e8f0',
-                        textAlign: 'center'
+                        borderRadius: '20px', 
+                        padding: '0',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(226, 232, 240, 0.8)',
+                        textAlign: 'center',
+                        overflow: 'hidden',
+                        position: 'relative'
                     }}
                 >
-                    <div style={{ 
-                        width: '80px', 
-                        height: '80px', 
-                        background: '#f0fdf4', 
-                        borderRadius: '50%', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        margin: '0 auto 2rem',
-                        border: '1px solid #dcfce7'
-                    }}>
-                        <CheckCircle size={40} color="#16a34a" />
-                    </div>
-                    
-                    <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>Quiz Completed!</h2>
-                    <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '2.5rem' }}>You have successfully finished the assessment.</p>
+                    {/* Decorative Top Background */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '100px',
+                        background: percentage >= 50 ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                        zIndex: 0
+                    }}></div>
 
-                    <div style={{ 
-                        background: '#f8fafc', 
-                        padding: '2rem', 
-                        borderRadius: '20px', 
-                        marginBottom: '2.5rem',
-                        border: '1px solid #e2e8f0'
-                    }}>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Final Score</div>
-                        <div style={{ fontSize: '3.5rem', fontWeight: 900, color: '#3b82f6', lineHeight: '1' }}>
-                            {score} <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>/ {questions.reduce((s, q) => s + q.marks, 0)}</span>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {resultId && (
-                            <button 
-                                onClick={() => navigate(`/student/analysis/${resultId}`)} 
-                                className="btn btn-primary" 
-                                style={{ padding: '1rem', borderRadius: '14px', fontWeight: 700, fontSize: '1rem' }}
-                            >
-                                View Detailed Analysis
-                            </button>
-                        )}
-                        <button 
-                            onClick={() => navigate('/student-dashboard')} 
-                            className="btn" 
-                            style={{ padding: '1rem', borderRadius: '14px', fontWeight: 600, background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}
+                    {/* Content Container (Scrollable) */}
+                    <div style={{ position: 'relative', zIndex: 1, padding: '1.25rem 1.5rem 1.25rem', overflowY: 'auto' }} className="custom-scrollbar">
+                        
+                        {/* Icon */}
+                        <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2, type: "spring" }}
+                            style={{ 
+                                width: '60px', 
+                                height: '60px', 
+                                background: 'white', 
+                                borderRadius: '50%', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                margin: '20px auto 0.75rem',
+                                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                                border: '3px solid white'
+                            }}
                         >
-                            Back to Dashboard
-                        </button>
+                            <CheckCircle size={30} color={percentage >= 50 ? "#10b981" : "#6366f1"} />
+                        </motion.div>
+                        
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.2rem' }}>
+                            Thank You!
+                        </h2>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: percentage >= 50 ? '#059669' : '#4f46e5', marginBottom: '0.4rem' }}>
+                            {greetMessage}
+                        </h3>
+                        <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.25rem', lineHeight: '1.4', padding: '0 0.5rem' }}>
+                            Your exams answers have been recorded.
+                        </p>
+
+                        <div style={{ 
+                            background: '#f8fafc', 
+                            padding: '1rem', 
+                            borderRadius: '16px', 
+                            marginBottom: '1.25rem',
+                            border: '1px solid #e2e8f0',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            {/* Inner decorative blob */}
+                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '80px', height: '80px', background: 'rgba(99, 102, 241, 0.04)', borderRadius: '50%' }}></div>
+                            
+                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.25rem' }}>Final Score</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#0f172a', lineHeight: '1', display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '0.3rem' }}>
+                                {score} <span style={{ fontSize: '1rem', color: '#94a3b8', fontWeight: 700 }}>/ {totalPossible}</span>
+                            </div>
+                            
+                            <div style={{ 
+                                marginTop: '0.75rem', 
+                                display: 'inline-block', 
+                                padding: '0.2rem 0.8rem', 
+                                background: percentage >= 50 ? '#dcfce7' : '#e0e7ff', 
+                                color: percentage >= 50 ? '#166534' : '#3730a3', 
+                                borderRadius: '100px', 
+                                fontSize: '0.75rem', 
+                                fontWeight: 800 
+                            }}>
+                                {percentage}% Accuracy
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {resultId && (
+                                <button 
+                                    onClick={() => navigate(`/student/analysis/${resultId}`)} 
+                                    className="btn btn-primary" 
+                                    style={{ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.9rem', boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.2)' }}
+                                >
+                                    Detailed Analysis
+                                </button>
+                            )}
+                            <button 
+                                onClick={() => navigate('/student-dashboard')} 
+                                className="btn" 
+                                style={{ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.9rem', background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}
+                            >
+                                Back to Dashboard
+                            </button>
+                        </div>
                     </div>
                 </motion.div>
             </div>
