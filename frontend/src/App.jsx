@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
@@ -14,6 +15,25 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ExamAnalysis from './pages/student/ExamAnalysis';
 import Profile from './pages/Profile';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 12, scale: 0.99 },
+  in: { opacity: 1, y: 0, scale: 1 },
+  out: { opacity: 0, y: -12, scale: 0.99 }
+};
+
+const AnimatedPage = ({ children }) => (
+  <motion.div
+    initial="initial"
+    animate="in"
+    exit="out"
+    variants={pageVariants}
+    transition={{ duration: 0.25, ease: 'easeOut' }}
+    style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
+  >
+    {children}
+  </motion.div>
+);
 
 // Layout component to handle conditional Navbar visibility and auto-logout on back/forward
 const Layout = () => {
@@ -72,33 +92,34 @@ const Layout = () => {
   return (
     <>
       {!hideNavbar && <Navbar />}
-      <Routes>
-        <Route path="/" element={<Home />} />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<AnimatedPage><Home /></AnimatedPage>} />
 
-        {/* Auth Routes */}
-        <Route path="/student/login" element={<Login userType="student" />} />
-        <Route path="/teacher/login" element={<Login userType="teacher" />} />
-        <Route path="/student/signup" element={<Signup userType="student" />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        {/* Teacher signup is removed as they are created by admin */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+          {/* Auth Routes */}
+          <Route path="/student/login" element={<AnimatedPage><Login userType="student" /></AnimatedPage>} />
+          <Route path="/teacher/login" element={<AnimatedPage><Login userType="teacher" /></AnimatedPage>} />
+          <Route path="/student/signup" element={<AnimatedPage><Signup userType="student" /></AnimatedPage>} />
+          <Route path="/forgot-password" element={<AnimatedPage><ForgotPassword /></AnimatedPage>} />
+          <Route path="/admin/login" element={<AnimatedPage><AdminLogin /></AnimatedPage>} />
 
-        {/* Admin Routes */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          {/* Admin Routes */}
+          <Route path="/admin-dashboard" element={<AnimatedPage><AdminDashboard /></AnimatedPage>} />
 
-        {/* Teacher Routes */}
-        <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-        <Route path="/teacher/create-quiz" element={<CreateQuiz />} />
-        <Route path="/teacher/add-question/:courseId" element={<AddQuestion />} />
+          {/* Teacher Routes */}
+          <Route path="/teacher-dashboard" element={<AnimatedPage><TeacherDashboard /></AnimatedPage>} />
+          <Route path="/teacher/create-quiz" element={<AnimatedPage><CreateQuiz /></AnimatedPage>} />
+          <Route path="/teacher/add-question/:courseId" element={<AnimatedPage><AddQuestion /></AnimatedPage>} />
 
-        {/* Student Routes */}
-        <Route path="/student-dashboard" element={<StudentDashboard />} />
-        <Route path="/student/take-quiz/:courseId" element={<TakeQuiz />} />
-        <Route path="/student/analysis/:resultId" element={<ExamAnalysis />} />
+          {/* Student Routes */}
+          <Route path="/student-dashboard" element={<AnimatedPage><StudentDashboard /></AnimatedPage>} />
+          <Route path="/student/take-quiz/:courseId" element={<AnimatedPage><TakeQuiz /></AnimatedPage>} />
+          <Route path="/student/analysis/:resultId" element={<AnimatedPage><ExamAnalysis /></AnimatedPage>} />
 
-        {/* Common Routes */}
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
+          {/* Common Routes */}
+          <Route path="/profile" element={<AnimatedPage><Profile /></AnimatedPage>} />
+        </Routes>
+      </AnimatePresence>
     </>
   );
 };

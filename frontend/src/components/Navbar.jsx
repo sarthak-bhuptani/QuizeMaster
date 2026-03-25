@@ -125,8 +125,8 @@ const Navbar = () => {
             <nav className={`navbar-premium ${scrolled ? 'scrolled' : ''}`}>
                 <div className="nav-container-inner">
                     <Link to="/" className="brand-section">
-                        <img src="/logo.png" alt="QuizMaster" className="brand-logo" />
-                        <span className="brand-title">QuizMaster</span>
+                        <img src="/logo.png" alt="QuizMaster Logo" className="brand-logo" />
+                        <span className="brand-title">{user ? `${user.role} Portal` : 'QuizMaster'}</span>
                     </Link>
 
                     {/* Desktop Menu - Center Aligned */}

@@ -114,10 +114,13 @@
 }
 
 .hero-title {
-    font-size: clamp(1.5rem, 5vw, 3.8rem); /* Slightly smaller max size */
+    font-size: clamp(1.5rem, 5vw, 3.8rem);
+    /* Slightly smaller max size */
     font-weight: 800;
-    line-height: 1.2; /* Increased for better legibility */
-    letter-spacing: -1.5px; /* Less aggressive negative spacing */
+    line-height: 1.2;
+    /* Increased for better legibility */
+    letter-spacing: -1.5px;
+    /* Less aggressive negative spacing */
     margin-bottom: 2.5rem;
 }
 
@@ -126,7 +129,8 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    padding-bottom: 0.1em; /* Prevent clipping of descenders */
+    padding-bottom: 0.1em;
+    /* Prevent clipping of descenders */
 }
 
 .hero-subtitle {
@@ -289,6 +293,161 @@
     color: #16a34a;
 }
 
+/* Pricing Premium */
+.pricing-premium {
+    padding: 5rem 0;
+    background: transparent;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    align-items: stretch;
+}
+
+.pricing-card {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(15px);
+    padding: 2.5rem 2rem;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    transition: transform 0.3s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pricing-card.popular {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #4f46e5;
+    box-shadow: 0 30px 60px -15px rgba(79, 70, 229, 0.2);
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.popular-badge {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4f46e5;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.tier-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #475569;
+    margin-bottom: 1rem;
+}
+
+.pricing-card.popular .tier-name {
+    color: #4f46e5;
+}
+
+.price-box {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.currency {
+    font-size: 1.25rem;
+    font-weight: 700;
+    vertical-align: top;
+    color: #0f172a;
+    margin-right: 0.2rem;
+}
+
+.duration {
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.tier-desc {
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.pricing-features li.disabled {
+    color: #94a3b8;
+}
+
+.text-success {
+    color: #10b981;
+}
+
+.text-primary {
+    color: #4f46e5;
+}
+
+.btn-pricing-solid {
+    margin-top: auto;
+    background: #4f46e5;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s;
+    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+}
+
+.btn-pricing-solid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px -5px rgba(79, 70, 229, 0.5);
+    color: white;
+}
+
+.btn-pricing-outline {
+    margin-top: auto;
+    background: transparent;
+    color: #0f172a;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 2px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.btn-pricing-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
 /* Portal Access */
 .portal-access {
     padding: 8rem 0;
@@ -350,6 +509,15 @@
         grid-template-columns: 1fr;
     }
 
+    .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .pricing-card.popular {
+        transform: none;
+    }
+
     .hero-stats {
         flex-wrap: wrap;
         gap: 2rem;
@@ -390,12 +558,12 @@
     .hero-title {
         font-size: 2rem;
     }
-    
+
     .hero-stats {
         padding: 1.5rem;
         gap: 1.5rem;
     }
-    
+
     .stat-item strong {
         font-size: 1.4rem;
     }

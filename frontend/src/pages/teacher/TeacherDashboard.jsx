@@ -180,19 +180,15 @@ const TeacherDashboard = () => {
         <div className="dashboard-container">
             {/* Desktop-only Sidebar */}
             <div className="dashboard-sidebar hide-on-mobile">
-                <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
-                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Teacher Portal</span>
-                </div>
 
-                <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div className="nav-items-container">
                     <NavButton id="overview" label="Dashboard" icon={LayoutDashboard} />
                     <NavButton id="quizzes" label="My Quizzes" icon={BookOpen} />
                     <NavButton id="students" label="Students" icon={Users} />
                     <NavButton id="results" label="Results" icon={Trophy} />
                 </div>
 
-                <div style={{ padding: '0 1.5rem', marginTop: 'auto', width: '100%' }}>
+                <div style={{ padding: '1rem', marginTop: 'auto', width: '100%' }}>
                     <button
                         onClick={handleLogout}
                         className="btn-danger-soft"
@@ -255,7 +251,12 @@ const TeacherDashboard = () => {
                 </div>
 
                 {loading ? (
-                    <div className="text-secondary">Syncing data...</div>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+                            {[1, 2, 3, 4].map(i => <div key={i} className="skeleton skeleton-box" style={{ height: 140, marginBottom: 0 }}></div>)}
+                        </div>
+                        <div className="skeleton skeleton-box" style={{ height: 350 }}></div>
+                    </motion.div>
                 ) : (
                     <>
                         {activeTab === 'overview' && (
@@ -337,112 +338,144 @@ const TeacherDashboard = () => {
                         )}
 
                         {activeTab === 'quizzes' && (
-                            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                                <div className="table-container">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Quiz Name</th>
-                                                <th>Questions</th>
-                                                <th>Total Marks</th>
-                                                <th>Time Limit</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {filterList(courses, 'course_name').map(course => (
-                                                <tr key={course._id}>
-                                                    <td style={{ fontWeight: 600 }}>{course.course_name}</td>
-                                                    <td><span className="text-success" style={{ fontWeight: 'bold' }}>{course.question_number}</span> Questions</td>
-                                                    <td>{course.total_marks} Marks</td>
-                                                    <td className="text-secondary">{course.time_limit} mins</td>
-                                                    <td style={{ display: 'flex', gap: '0.8rem' }}>
-                                                        <button onClick={() => navigate(`/teacher/add-question/${course._id}`)} className="btn btn-outline" style={{ padding: '0.5rem', color: 'var(--primary)' }} title="Manage Questions">
-                                                            <Edit size={18} />
-                                                        </button>
-                                                        <button onClick={() => handleDeleteCourse(course._id)} className="btn btn-outline" style={{ padding: '0.5rem', color: 'var(--danger)' }} title="Delete Quiz">
-                                                            <Trash2 size={18} />
-                                                        </button>
-                                                    </td>
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card" style={{ padding: courses.length === 0 ? '2rem' : 0, overflow: 'hidden' }}>
+                                {courses.length === 0 ? (
+                                    <div className="empty-state" style={{ border: 'none', background: 'transparent', margin: 0 }}>
+                                        <div className="empty-state-icon"><BookOpen size={36} /></div>
+                                        <h3>No Quizzes Created Yet</h3>
+                                        <p>You haven't added any assessments. Get started instantly with our AI Generator or build one manually.</p>
+                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                            <button className="btn btn-primary" onClick={() => setShowAIModal(true)}><Sparkles size={18} /> Generate with AI</button>
+                                            <button className="btn btn-outline" onClick={() => navigate('/teacher/create-quiz')}><PlusCircle size={18} /> Manual Entry</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="table-container">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Quiz Name</th>
+                                                    <th>Questions</th>
+                                                    <th>Total Marks</th>
+                                                    <th>Time Limit</th>
+                                                    <th>Actions</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                            </thead>
+                                            <tbody>
+                                                {filterList(courses, 'course_name').map(course => (
+                                                    <tr key={course._id}>
+                                                        <td style={{ fontWeight: 600 }}>{course.course_name}</td>
+                                                        <td><span className="text-success" style={{ fontWeight: 'bold' }}>{course.question_number}</span> Questions</td>
+                                                        <td>{course.total_marks} Marks</td>
+                                                        <td className="text-secondary">{course.time_limit} mins</td>
+                                                        <td style={{ display: 'flex', gap: '0.8rem' }}>
+                                                            <button onClick={() => navigate(`/teacher/add-question/${course._id}`)} className="btn btn-outline" style={{ padding: '0.5rem', color: 'var(--primary)', border: 'none', background: 'var(--primary-dim)' }} title="Manage Questions">
+                                                                <Edit size={18} />
+                                                            </button>
+                                                            <button onClick={() => handleDeleteCourse(course._id)} className="btn btn-outline" style={{ padding: '0.5rem', color: 'var(--danger)', border: 'none', background: 'var(--danger-soft)' }} title="Delete Quiz">
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </motion.div>
                         )}
 
                         {activeTab === 'students' && (
-                            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                                <div className="table-container">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Student</th>
-                                                <th>ID/Username</th>
-                                                <th>Contact</th>
-                                                <th>Quizzes Taken</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {filterList(students, 'first_name').map(student => (
-                                                <tr key={student._id}>
-                                                    <td style={{ fontWeight: 600 }}>{student.user?.first_name} {student.user?.last_name}</td>
-                                                    <td className="text-secondary">@{student.user?.username}</td>
-                                                    <td>{student.mobile}</td>
-                                                    <td>
-                                                        {results.filter(r => (r.student_id?._id === student._id || r.student_id === student._id)).length}
-                                                    </td>
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card" style={{ padding: students.length === 0 ? '2rem' : 0, overflow: 'hidden' }}>
+                                {students.length === 0 ? (
+                                    <div className="empty-state" style={{ border: 'none', background: 'transparent', margin: 0 }}>
+                                        <div className="empty-state-icon"><Users size={36} /></div>
+                                        <h3>No Students Enrolled</h3>
+                                        <p>There are no students registered on the platform right now.</p>
+                                    </div>
+                                ) : (
+                                    <div className="table-container">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Student</th>
+                                                    <th>ID/Username</th>
+                                                    <th>Contact</th>
+                                                    <th>Quizzes Taken</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                            </thead>
+                                            <tbody>
+                                                {filterList(students, 'first_name').map(student => (
+                                                    <tr key={student._id}>
+                                                        <td style={{ fontWeight: 600 }}>{student.user?.first_name} {student.user?.last_name}</td>
+                                                        <td className="text-secondary">@{student.user?.username}</td>
+                                                        <td>{student.mobile}</td>
+                                                        <td>
+                                                            <span style={{ fontWeight: 'bold', color: 'var(--primary)', background: 'var(--primary-dim)', padding: '2px 8px', borderRadius: '10px' }}>
+                                                                {results.filter(r => (r.student_id?._id === student._id || r.student_id === student._id)).length}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </motion.div>
                         )}
 
                         {activeTab === 'results' && (
-                            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                                <div className="table-container">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Student</th>
-                                                <th>Quiz</th>
-                                                <th>Score</th>
-                                                <th>Percentage</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {results.filter(r => {
-                                                const sName = `${r.student_id?.user?.first_name} ${r.student_id?.user?.last_name}`.toLowerCase();
-                                                const qName = (r.exam_id?.course_name || '').toLowerCase();
-                                                return sName.includes(searchTerm.toLowerCase()) || qName.includes(searchTerm.toLowerCase());
-                                            }).map((result, i) => (
-                                                <tr key={result._id || i}>
-                                                    <td>{result.student_id?.user?.first_name || 'Student'} {result.student_id?.user?.last_name || ''}</td>
-                                                    <td>{result.exam_id?.course_name || 'Quiz'}</td>
-                                                    <td style={{ fontWeight: 'bold' }}>{result.marks} / {result.total_marks}</td>
-                                                    <td>
-                                                        <span style={{
-                                                            color: (result.marks / result.total_marks >= 0.4) ? 'var(--success)' : 'var(--danger)',
-                                                            fontWeight: 'bold'
-                                                        }}>
-                                                            {(result.marks / result.total_marks * 100).toFixed(0)}%
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <button onClick={() => handleDeleteResult(result._id || result.id)} className="btn btn-outline" style={{ color: 'var(--danger)', padding: '0.5rem' }}>
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </td>
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card" style={{ padding: results.length === 0 ? '2rem' : 0, overflow: 'hidden' }}>
+                                {results.length === 0 ? (
+                                    <div className="empty-state" style={{ border: 'none', background: 'transparent', margin: 0 }}>
+                                        <div className="empty-state-icon"><Trophy size={36} /></div>
+                                        <h3>No Results Yet</h3>
+                                        <p>No students have completed any of your quizzes yet. Once they do, their performance analytics will appear here.</p>
+                                    </div>
+                                ) : (
+                                    <div className="table-container">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Student</th>
+                                                    <th>Quiz</th>
+                                                    <th>Score</th>
+                                                    <th>Percentage</th>
+                                                    <th>Actions</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                            </thead>
+                                            <tbody>
+                                                {results.filter(r => {
+                                                    const sName = `${r.student_id?.user?.first_name} ${r.student_id?.user?.last_name}`.toLowerCase();
+                                                    const qName = (r.exam_id?.course_name || '').toLowerCase();
+                                                    return sName.includes(searchTerm.toLowerCase()) || qName.includes(searchTerm.toLowerCase());
+                                                }).map((result, i) => (
+                                                    <tr key={result._id || i}>
+                                                        <td>{result.student_id?.user?.first_name || 'Student'} {result.student_id?.user?.last_name || ''}</td>
+                                                        <td style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{result.exam_id?.course_name || 'Quiz'}</td>
+                                                        <td style={{ fontWeight: 'bold' }}>{result.marks} / {result.total_marks}</td>
+                                                        <td>
+                                                            <span style={{
+                                                                color: (result.marks / result.total_marks >= 0.4) ? 'var(--success)' : 'var(--danger)',
+                                                                background: (result.marks / result.total_marks >= 0.4) ? '#d1fae5' : '#fee2e2',
+                                                                padding: '4px 8px', borderRadius: '6px',
+                                                                fontWeight: 'bold'
+                                                            }}>
+                                                                {(result.marks / result.total_marks * 100).toFixed(0)}%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button onClick={() => handleDeleteResult(result._id || result.id)} className="btn btn-outline" style={{ color: 'var(--danger)', padding: '0.5rem', border: 'none', background: 'var(--danger-soft)' }}>
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </motion.div>
                         )}
                     </>
                 )}

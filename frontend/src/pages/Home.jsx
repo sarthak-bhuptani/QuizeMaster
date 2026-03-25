@@ -106,6 +106,64 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Pricing Section */}
+            <section className="pricing-premium">
+                <div className="container">
+                    <div className="section-header">
+                        <h2>Simple, Transparent Pricing</h2>
+                        <p>Choose the perfect tier for you or your institution</p>
+                    </div>
+
+                    <div className="pricing-grid">
+                        <div className="pricing-card">
+                            <div className="tier-name">Student Basic</div>
+                            <div className="price-box">
+                                <span className="currency">$</span>0<span className="duration">/forever</span>
+                            </div>
+                            <p className="tier-desc">Perfect for students looking to test their knowledge.</p>
+                            <ul className="pricing-features">
+                                <li><CheckCircle2 size={18} className="text-success" /> Public Quizzes</li>
+                                <li><CheckCircle2 size={18} className="text-success" /> Basic Tracking</li>
+                                <li><CheckCircle2 size={18} className="text-success" /> Global Leaderboard</li>
+                                <li className="disabled"><Shield size={18} /> Direct Support</li>
+                            </ul>
+                            <Link to="/student/signup" className="btn-pricing-outline">Get Started Free</Link>
+                        </div>
+
+                        <div className="pricing-card popular">
+                            <div className="popular-badge">Most Popular</div>
+                            <div className="tier-name">Pro Educator</div>
+                            <div className="price-box">
+                                <span className="currency">$</span>19<span className="duration">/month</span>
+                            </div>
+                            <p className="tier-desc">Everything a teacher needs to manage a digital classroom.</p>
+                            <ul className="pricing-features">
+                                <li><CheckCircle2 size={18} className="text-primary" /> Advanced AI Generator</li>
+                                <li><CheckCircle2 size={18} className="text-primary" /> Detailed Analytics</li>
+                                <li><CheckCircle2 size={18} className="text-primary" /> Unlimited Students</li>
+                                <li><CheckCircle2 size={18} className="text-primary" /> Priority Support</li>
+                            </ul>
+                            <Link to="/teacher/login" className="btn-pricing-solid">Start 14-Day Trial</Link>
+                        </div>
+
+                        <div className="pricing-card">
+                            <div className="tier-name">Academy Enterprise</div>
+                            <div className="price-box">
+                                <span className="currency">$</span>99<span className="duration">/month</span>
+                            </div>
+                            <p className="tier-desc">For schools and enterprise training programs.</p>
+                            <ul className="pricing-features">
+                                <li><CheckCircle2 size={18} className="text-success" /> Everything in Pro</li>
+                                <li><CheckCircle2 size={18} className="text-success" /> Custom Branding</li>
+                                <li><CheckCircle2 size={18} className="text-success" /> API Access</li>
+                                <li><CheckCircle2 size={18} className="text-success" /> Dedicated Manager</li>
+                            </ul>
+                            <Link to="/admin/login" className="btn-pricing-outline">Contact Sales</Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Dynamic Access Section */}
             <section className="portal-access">
                 <div className="container">

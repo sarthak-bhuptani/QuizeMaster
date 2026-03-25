@@ -115,20 +115,16 @@ const StudentDashboard = () => {
         <div className="dashboard-container">
             {/* Sidebar */}
             <div className="dashboard-sidebar hide-on-mobile">
-                <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
-                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Student Portal</span>
-                </div>
 
-                <div style={{ padding: '0 1.5rem 2.5rem' }} className="nav-items-container">
+                <div className="nav-items-container">
                     <NavButton id="overview" label="My Overview" icon={LayoutDashboard} />
                     <NavButton id="exams" label="Available Exams" icon={BookOpen} />
                     <NavButton id="history" label="Result History" icon={Activity} />
                     <NavButton id="leaderboard" label="Hall of Fame" icon={Trophy} />
                 </div>
 
-                <div className="hide-on-mobile" style={{ padding: '0 1.5rem', marginTop: '1rem' }}>
-                    <div className="glass-card" style={{ padding: '1rem', background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(99, 102, 241, 0.1))', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="hide-on-mobile" style={{ padding: '0 1rem', marginTop: '1rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(99, 102, 241, 0.15))', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
                         <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.75rem', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Current Streak</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                             <Flame size={18} className="text-warning" fill="currentColor" fillOpacity={0.2} />
@@ -137,7 +133,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
 
-                <div className="hide-on-mobile" style={{ marginTop: 'auto', padding: '1.5rem', width: '100%' }}>
+                <div className="hide-on-mobile" style={{ padding: '1rem', marginTop: 'auto', width: '100%' }}>
                     <button
                         onClick={handleLogout}
                         className="btn-danger-soft"
@@ -176,7 +172,12 @@ const StudentDashboard = () => {
                 </div>
 
                 {loading ? (
-                    <div className="text-secondary">Preparing your portal...</div>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="stats-grid">
+                            {[1, 2, 3, 4].map(i => <div key={i} className="skeleton skeleton-box" style={{ height: 120, marginBottom: 0 }}></div>)}
+                        </div>
+                        <div className="skeleton skeleton-box" style={{ height: 350 }}></div>
+                    </motion.div>
                 ) : (
                     <>
                         {activeTab === 'overview' && (
@@ -277,73 +278,90 @@ const StudentDashboard = () => {
                                         style={{ paddingLeft: '3.5rem' }}
                                     />
                                 </div>
-                                <div className="exam-cards-grid">
-                                    {courses.filter(c => c.course_name.toLowerCase().includes(searchTerm.toLowerCase())).map((course, idx) => {
-                                        const accents = ['#6366f1','#0ea5e9','#10b981','#f59e0b','#ec4899','#f97316'];
-                                        const accent = accents[idx % accents.length];
-                                        const alreadyDone = myResults.some(r => r.exam_id?._id === course._id || r.exam_id === course._id);
-                                        return (
-                                            <div key={course._id} className="exam-card-simple" style={{ borderLeftColor: accent }}>
-                                                <div className="exam-card-simple-top">
-                                                    <div className="exam-card-icon" style={{ background: `${accent}18`, color: accent }}>
-                                                        {course.course_name[0].toUpperCase()}
+                                {courses.filter(c => c.course_name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="empty-state">
+                                        <div className="empty-state-icon"><BookOpen size={36} /></div>
+                                        <h3>No Exams Found</h3>
+                                        <p>There are currently no exams available to take at the moment. Keep an eye out for updates!</p>
+                                    </motion.div>
+                                ) : (
+                                    <div className="exam-cards-grid">
+                                        {courses.filter(c => c.course_name.toLowerCase().includes(searchTerm.toLowerCase())).map((course, idx) => {
+                                            const accents = ['#6366f1','#0ea5e9','#10b981','#f59e0b','#ec4899','#f97316'];
+                                            const accent = accents[idx % accents.length];
+                                            const alreadyDone = myResults.some(r => r.exam_id?._id === course._id || r.exam_id === course._id);
+                                            return (
+                                                <div key={course._id} className="exam-card-simple" style={{ borderLeftColor: accent }}>
+                                                    <div className="exam-card-simple-top">
+                                                        <div className="exam-card-icon" style={{ background: `${accent}18`, color: accent }}>
+                                                            {course.course_name[0].toUpperCase()}
+                                                        </div>
+                                                        {alreadyDone && <span className="exam-attempted-tag">Done</span>}
                                                     </div>
-                                                    {alreadyDone && <span className="exam-attempted-tag">Done</span>}
+
+                                                    <h3 className="exam-card-name">{course.course_name}</h3>
+
+                                                    <div className="exam-card-meta">
+                                                        <span><Clock size={13} /> {course.time_limit} min</span>
+                                                        <span><Target size={13} /> {course.total_marks} pts</span>
+                                                        <span><BookOpen size={13} /> {course.question_number} Qs</span>
+                                                    </div>
+
+                                                    <Link to={`/student/take-quiz/${course._id}`}>
+                                                        <button className="exam-card-btn" style={{ borderColor: accent, color: accent }}>
+                                                            {alreadyDone ? 'Retake' : 'Start Exam'} <ArrowRight size={15} />
+                                                        </button>
+                                                    </Link>
                                                 </div>
-
-                                                <h3 className="exam-card-name">{course.course_name}</h3>
-
-                                                <div className="exam-card-meta">
-                                                    <span><Clock size={13} /> {course.time_limit} min</span>
-                                                    <span><Target size={13} /> {course.total_marks} pts</span>
-                                                    <span><BookOpen size={13} /> {course.question_number} Qs</span>
-                                                </div>
-
-                                                <Link to={`/student/take-quiz/${course._id}`}>
-                                                    <button className="exam-card-btn" style={{ borderColor: accent, color: accent }}>
-                                                        {alreadyDone ? 'Retake' : 'Start Exam'} <ArrowRight size={15} />
-                                                    </button>
-                                                </Link>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </>
                         )}
 
                         {activeTab === 'history' && (
-                            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                                <div className="table-container">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Exam Name</th>
-                                                <th>Date</th>
-                                                <th>Score / Total</th>
-                                                <th>Result</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {myResults.map((res, i) => (
-                                                <tr key={i}>
-                                                    <td style={{ fontWeight: 'bold' }}>{res.exam_id?.course_name || 'Quiz'}</td>
-                                                    <td className="text-secondary">{new Date(res.date).toLocaleDateString()}</td>
-                                                    <td>{res.marks} / {res.total_marks}</td>
-                                                    <td>
-                                                        <span className={res.marks / res.total_marks >= 0.4 ? "bg-success-soft" : "bg-danger-soft"} style={{ padding: '0.4rem 0.8rem', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                                            {res.marks / res.total_marks >= 0.4 ? 'PASSED' : 'RETAKE'}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <button onClick={() => navigate(`/student/analysis/${res._id}`)} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Analysis</button>
-                                                    </td>
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card" style={{ padding: myResults.length === 0 ? '2rem' : 0, overflow: 'hidden' }}>
+                                {myResults.length === 0 ? (
+                                    <div className="empty-state" style={{ border: 'none', background: 'transparent', margin: 0 }}>
+                                        <div className="empty-state-icon"><Activity size={36} /></div>
+                                        <h3>No History Yet</h3>
+                                        <p>You haven't taken any exams yet. Head over to the Available Exams tab to get started!</p>
+                                        <button className="btn btn-primary" onClick={() => setActiveTab('exams')} style={{ marginTop: '1rem' }}>Browse Exams <ArrowRight size={16}/></button>
+                                    </div>
+                                ) : (
+                                    <div className="table-container">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Exam Name</th>
+                                                    <th>Date</th>
+                                                    <th>Score / Total</th>
+                                                    <th>Result</th>
+                                                    <th>Actions</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                            </thead>
+                                            <tbody>
+                                                {myResults.map((res, i) => (
+                                                    <tr key={i}>
+                                                        <td style={{ fontWeight: 'bold' }}>{res.exam_id?.course_name || 'Quiz'}</td>
+                                                        <td className="text-secondary">{new Date(res.date).toLocaleDateString()}</td>
+                                                        <td>{res.marks} / {res.total_marks}</td>
+                                                        <td>
+                                                            <span className={res.marks / res.total_marks >= 0.4 ? "bg-success-soft" : "bg-danger-soft"} style={{ padding: '0.4rem 0.8rem', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                                                {res.marks / res.total_marks >= 0.4 ? 'PASSED' : 'RETAKE'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button onClick={() => navigate(`/student/analysis/${res._id}`)} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Analysis</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </motion.div>
                         )}
 
                         {activeTab === 'leaderboard' && (
@@ -354,7 +372,11 @@ const StudentDashboard = () => {
                                 </div>
                                 <div className="glass-card">
                                     {leaderboard.length === 0 ? (
-                                        <div style={{ padding: '3rem', textAlign: 'center' }} className="text-secondary">No rankings available yet.</div>
+                                        <div className="empty-state" style={{ border: 'none', background: 'transparent', margin: 0 }}>
+                                            <div className="empty-state-icon"><Trophy size={36} /></div>
+                                            <h3>Leaderboard Empty</h3>
+                                            <p>No rankings available yet. Be the first to take a quiz and claim the #1 spot!</p>
+                                        </div>
                                     ) : (
                                         leaderboard.map((entry, idx) => (
                                             <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '2rem', padding: '1.5rem', borderBottom: idx === leaderboard.length - 1 ? 'none' : '1px solid var(--glass-border)', background: (entry.student_id?._id === user?.studentId || entry.student_id === user?.studentId) ? 'var(--primary-dim)' : 'transparent', borderRadius: (entry.student_id?._id === user?.studentId || entry.student_id === user?.studentId) ? '12px' : 0 }}>

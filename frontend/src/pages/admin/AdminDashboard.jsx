@@ -195,10 +195,6 @@ const AdminDashboard = () => {
         <div className="dashboard-container">
             {/* Desktop-only Sidebar */}
             <div className="dashboard-sidebar hide-on-mobile">
-                <div style={{ padding: '1.25rem 1.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img src="/logo.png" alt="QuizMaster Logo" style={{ width: '35px', height: '35px', borderRadius: '10px' }} />
-                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Admin Portal</span>
-                </div>
 
                 <div className="nav-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <TabButton id="overview" label="Overview" icon={LayoutDashboard} />
