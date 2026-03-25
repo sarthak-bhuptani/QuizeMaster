@@ -35,13 +35,13 @@ const AdminDashboard = () => {
     };
 
     useEffect(() => {
-        const admin = localStorage.getItem('admin');
+        const admin = sessionStorage.getItem('admin');
         if (!admin) navigate('/admin/login');
         loadAllData();
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('admin');
+        sessionStorage.removeItem('admin');
         navigate('/');
     };
     /* ... existing functions ... */

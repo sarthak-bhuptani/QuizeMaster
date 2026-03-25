@@ -24,7 +24,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const storedUser = JSON.parse(localStorage.getItem('user'));
+                const storedUser = JSON.parse(sessionStorage.getItem('user'));
                 if (!storedUser) {
                     navigate('/');
                     return;
@@ -113,9 +113,9 @@ const Profile = () => {
             setMessage({ type: 'success', text: 'Profile updated successfully!' });
             
             // Update local storage name if changed
-            const storedUser = JSON.parse(localStorage.getItem('user'));
+            const storedUser = JSON.parse(sessionStorage.getItem('user'));
             storedUser.name = formData.first_name;
-            localStorage.setItem('user', JSON.stringify(storedUser));
+            sessionStorage.setItem('user', JSON.stringify(storedUser));
             
             // Refresh local data
             setUserData({ 

@@ -34,7 +34,7 @@ const TeacherDashboard = () => {
     };
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = sessionStorage.getItem('user');
         if (!storedUser) {
             navigate('/teacher/login');
             return;
@@ -49,8 +49,8 @@ const TeacherDashboard = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('admin');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('admin');
         navigate('/');
     };
     /* ... existing functions ... */

@@ -11,8 +11,8 @@ const Login = ({ userType }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('admin');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('admin');
         // Removed overflow hidden to allow scrolling below navbar
         return () => { document.body.style.overflow = 'auto'; };
     }, []);
@@ -29,7 +29,7 @@ const Login = ({ userType }) => {
         try {
             const endpoint = userType === 'student' ? '/student/login' : '/teacher/login';
             const res = await api.post(endpoint, formData);
-            localStorage.setItem('user', JSON.stringify(res.data));
+            sessionStorage.setItem('user', JSON.stringify(res.data));
 
             if (userType === 'student') {
                 navigate('/student-dashboard');

@@ -11,8 +11,8 @@ const AdminLogin = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('admin');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('admin');
         return () => { document.body.style.overflow = 'auto'; };
     }, []);
 
@@ -27,7 +27,7 @@ const AdminLogin = () => {
 
         try {
             const res = await api.post('/admin/login', formData);
-            localStorage.setItem('admin', JSON.stringify(res.data));
+            sessionStorage.setItem('admin', JSON.stringify(res.data));
             navigate('/admin-dashboard');
 
         } catch (err) {

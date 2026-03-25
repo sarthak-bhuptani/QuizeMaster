@@ -28,12 +28,12 @@ const Layout = () => {
     const LOGOUT_FLAG_KEY = 'quizmaster_back_nav_flag';
 
     const isLoggedIn = () => {
-      return Boolean(localStorage.getItem('user') || localStorage.getItem('admin'));
+      return Boolean(sessionStorage.getItem('user') || sessionStorage.getItem('admin'));
     };
 
     const logout = () => {
-      localStorage.removeItem('user');
-      localStorage.removeItem('admin');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('admin');
       navigate('/student/login');
     };
 

@@ -64,7 +64,8 @@
     font-size: 0.95rem;
 }
 
-.nav-item:hover, .nav-item.active {
+.nav-item:hover,
+.nav-item.active {
     color: #4f46e5;
 }
 
@@ -231,7 +232,9 @@
     right: 0;
     bottom: 0;
     width: 320px;
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     z-index: 5000;
     display: flex;
     flex-direction: column;
@@ -323,7 +326,8 @@
     cursor: pointer;
 }
 
-.drawer-item:hover, .drawer-item.active {
+.drawer-item:hover,
+.drawer-item.active {
     background: #f1f5f9;
     color: #4f46e5;
 }
@@ -434,9 +438,11 @@
     .nav-links-centered {
         display: none;
     }
+
     .btn-mobile-toggle {
         display: flex;
     }
+
     .nav-container-inner {
         padding: 0 1.5rem;
     }
@@ -446,7 +452,9 @@
     .brand-title {
         font-size: 1.15rem;
     }
+
     .mobile-drawer {
-        width: 100%;
+        width: 70%;
+        min-width: 250px;
     }
 }

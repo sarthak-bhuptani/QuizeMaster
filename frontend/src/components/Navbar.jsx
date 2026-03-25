@@ -28,8 +28,8 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        const userData = localStorage.getItem('user');
-        const adminData = localStorage.getItem('admin');
+        const userData = sessionStorage.getItem('user');
+        const adminData = sessionStorage.getItem('admin');
 
         if (userData) {
             const parsed = JSON.parse(userData);
@@ -83,8 +83,8 @@ const Navbar = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('admin');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('admin');
         setUser(null);
         navigate('/');
     };

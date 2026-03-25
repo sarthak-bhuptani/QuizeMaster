@@ -9,8 +9,8 @@ const Home = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const user = localStorage.getItem('user');
-        const admin = localStorage.getItem('admin');
+        const user = sessionStorage.getItem('user');
+        const admin = sessionStorage.getItem('admin');
         if (user) {
             const parsed = JSON.parse(user);
             if (parsed.teacherId) navigate('/teacher-dashboard');

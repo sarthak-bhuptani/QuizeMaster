@@ -5,7 +5,7 @@ const Footer = () => {
     return (
         <footer style={footerStyle}>
             <div style={containerStyle}>
-                <div style={gridStyle}>
+                <div className="footer-grid" style={gridStyle}>
                     {/* Brand */}
                     <div style={{ paddingRight: '2rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -40,12 +40,12 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div style={bottomStyle}>
+                <div className="footer-bottom" style={bottomStyle}>
                     <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>&copy; 2024 QuizMaster <Link to="/admin/login" style={{ color: 'inherit', textDecoration: 'none', cursor: 'default' }}>Inc.</Link> All rights reserved.</p>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <a href="#" style={socialLinkStyle}><Twitter size={18} /></a>
-                        <a href="#" style={socialLinkStyle}><Github size={18} /></a>
-                        <a href="#" style={socialLinkStyle}><Linkedin size={18} /></a>
+                    <div className="social-links" style={{ display: 'flex', gap: '1rem' }}>
+                        <a href="https://x.com/Sarthak00125445" target="_blank" rel="noopener noreferrer" style={socialLinkStyle}><Twitter size={18} /></a>
+                        <a href="https://github.com/sarthak-bhuptani" target="_blank" rel="noopener noreferrer" style={socialLinkStyle}><Github size={18} /></a>
+                        <a href="https://www.linkedin.com/in/sarthak-bhuptani/" target="_blank" rel="noopener noreferrer" style={socialLinkStyle}><Linkedin size={18} /></a>
                     </div>
                 </div>
             </div>
@@ -53,6 +53,7 @@ const Footer = () => {
                 @media (max-width: 768px) {
                     .footer-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
                     .footer-bottom { flex-direction: column !important; gap: 1rem !important; text-align: center; }
+                    .social-links { justify-content: center; }
                 }
             `}</style>
         </footer>
@@ -76,7 +77,6 @@ const gridStyle = {
     gridTemplateColumns: '2fr 1fr 1fr',
     gap: '4rem',
     marginBottom: '4rem',
-    className: 'footer-grid'
 };
 
 const iconWrapperStyle = {
@@ -116,7 +116,6 @@ const bottomStyle = {
     alignItems: 'center',
     paddingTop: '2rem',
     borderTop: '1px solid #e2e8f0',
-    className: 'footer-bottom'
 };
 
 const socialLinkStyle = {
