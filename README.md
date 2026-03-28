@@ -11,44 +11,43 @@ QuizMaster is a modern, high-performance web application built with the **MERN S
 ## ✨ Key Features
 
 ### 🎭 Role-Based Access Control
-- **👨‍🎓 Student**: Take quizzes, track progress (XP, streaks, badges), view leaderboards, and manage their personal **User Profile**.
+- **👨‍🎓 Student**: Take quizzes, track progress (XP, streaks, badges), view leaderboards, and manage personal profile.
 - **👩‍🏫 Teacher**: Create manual or AI-generated quizzes, view class analytics, and manage students.
-- **🛡️ Admin**: Complete system oversight, user management, and advanced administrative dashboards.
+- **🛡️ Admin**: Full system oversight, user management, and advanced dashboards.
 
 ### 🔐 Advanced Authentication
-- **Flexible Login**: Support for both Email and Username/ID login.
-- **Case-Insensitive Support**: Robust matching for emails and usernames to prevent common login failures.
-- **Secure Password Recovery**: Integrated OTP-based "Forgot Password" system using automated SMTP email delivery.
+- Flexible login supporting Email and Username/ID.
+- Case‑insensitive matching for emails and usernames.
+- Secure OTP‑based "Forgot Password" via automated SMTP email.
 
-### 🤖 AI-Powered Quiz Generation
-- Integrated **Google Gemini Flash** API (`gemini-flash-latest`) to automatically generate quizzes based on ANY topic and difficulty level.
-- Smart parsing ensures consistent JSON output for seamless frontend integration.
+### 🤖 AI‑Powered Quiz Generation
+- Integrated **Google Gemini Flash** API to generate quizzes on any topic and difficulty.
+- Consistent JSON output for seamless frontend integration.
 
 ### 🎮 Gamification System
-- **XP & Leveling**: Earn XP for every correct answer and level up your profile.
-- **Badges**: Unlockable achievements like "Speedster", "Scholar", and "Streak Master".
-- **Leaderboards**: Global "Hall of Fame" to foster healthy competition.
+- **XP & Leveling**: Earn XP for correct answers and level up.
+- **Badges**: Unlock achievements like "Speedster", "Scholar", and "Streak Master".
+- **Leaderboards**: Global "Hall of Fame" for healthy competition.
 
 ### 🎨 Premium UI/UX
-- **Modern Layouts**: Compact and balanced designs for Login and Signup pages.
-- **Navigation Flow**: Seamless "Back to Home" options from authentication screens and a personalized Navbar dropdown.
-- **Interactive**: Smooth animations powered by **Framer Motion** and high-quality icons from **Lucide React**.
+- Modern, compact layouts for authentication pages.
+- Smooth animations powered by **Framer Motion** and icons from **Lucide React**.
 
 ## 🛠️ Tech Stack
 
 ### Frontend
 - **Framework**: React (Vite)
-- **Styling**: Vanilla CSS with a customized modern Design System.
+- **Styling**: Vanilla CSS with a custom Design System
 - **Animation**: Framer Motion
 - **Icons**: Lucide React
 - **Charts**: Recharts
-- **HTTP Client**: Axios/Fetch
+- **HTTP Client**: Axios / Fetch
 
 ### Backend
 - **Runtime**: Node.js
 - **Framework**: Express.js
 - **Database**: MongoDB (Mongoose)
-- **Emailing**: Nodemailer (SMTP with Gmail Support)
+- **Emailing**: Nodemailer (SMTP with Gmail)
 - **AI Engine**: Google Generative AI SDK
 
 ## 🚀 Getting Started
@@ -65,23 +64,21 @@ cd onlinequiz-mern
 ```
 
 ### 2. Backend Setup
-Navigate to the `backend` folder:
 ```bash
 cd backend
 npm install
 ```
-
 Create a `.env` file in the `backend` directory:
 ```env
 PORT=5001
 MONGO_URI=your_mongodb_connection_string
 GEMINI_API_KEY=your_google_gemini_api_key
 
-# Email Config (Example for Gmail)
+# Email Config (Gmail example)
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_16_digit_app_password
 ```
-> **Note**: For `EMAIL_PASS`, you MUST generate a 16-character **App Password** from your Google Account Security settings.
+> **Note**: Use a 16‑character App Password from Google Account Security settings.
 
 Start the backend:
 ```bash
@@ -89,14 +86,18 @@ npm start
 ```
 
 ### 3. Frontend Setup
-Navigate to the `frontend` folder:
 ```bash
 cd ../frontend
 npm install
 npm run dev
 ```
-
 The app will be available at `http://localhost:5173`.
 
+## 🧹 Clean‑up Notes
+- Removed the generated `frontend/dist` folder (re‑generated on production build).
+- Deleted unused image assets (`auth-bg.png`, `auth-bg-photo.png`, hero images, analytics/dashboard visuals, etc.).
+- Removed obsolete scripts `update_urls.js` and `verify_db.js`.
+- The codebase now contains only the assets required for development and production builds.
+
 ## 📄 License
-This project is open-source and available under the [ISC License](LICENSE).
+This project is open‑source and available under the [ISC License](LICENSE).
