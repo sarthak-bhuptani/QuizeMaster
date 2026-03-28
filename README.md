@@ -93,11 +93,8 @@ npm run dev
 ```
 The app will be available at `http://localhost:5173`.
 
-## 🧹 Clean‑up Notes
-- Removed the generated `frontend/dist` folder (re‑generated on production build).
-- Deleted unused image assets (`auth-bg.png`, `auth-bg-photo.png`, hero images, analytics/dashboard visuals, etc.).
-- Removed obsolete scripts `update_urls.js` and `verify_db.js`.
-- The codebase now contains only the assets required for development and production builds.
+**Live Demo:** https://quizeemaster.netlify.app/
+
 
 ## 📄 License
 This project is open‑source and available under the [ISC License](LICENSE).
